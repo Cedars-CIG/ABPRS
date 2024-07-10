@@ -17,10 +17,10 @@ METHOD 1:
 METHOD 2:
 
 If you do not wish to install in the R library and solely wish to load the package, use:
-         
-     ```ruby
-     devtools::load_all("filepath")
-     ```
+
+```ruby
+devtools::load_all("filepath")
+```
 
 # Tasks:
 - Come up with better names
