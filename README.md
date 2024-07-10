@@ -22,6 +22,15 @@ If you do not wish to install in the R library and solely wish to load the packa
 devtools::load_all("filepath")
 ```
 
+# Current Functions:
+- learning_betas
+- convert_theta
+- AUC_test
+- Loss_test
+- FDR_selection_GLM
+- FDR_selection_LM
+- Lasso_selection
+
 # Tasks:
 - Come up with better names
 - See which functions to keep/combine
