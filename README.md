@@ -1,4 +1,5 @@
 # ABPRS
+Hi :D Here's a preliminary R package for ABPRS. Please let me know if you have any questions!
 
 # Instructions on How to Load R Package:
 Since it is currently a private package, you will need to download it first before installing. 
