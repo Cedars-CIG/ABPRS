@@ -199,9 +199,11 @@ Plot_Score <- function(support_ABPRS=support_ABPRS, prs_train=prs_train, prs_tes
     #Compare scores
     score_ABPRS = AUC_test(support_ABPRS, prs_train, prs_test, pheno_train, pheno_test, theta_train, theta_test)
     score_PRS = AUC_test(NULL, prs_train, prs_test, pheno_train, pheno_test, theta_train, theta_test)
+    ylab = "AUC Score"
   }else{
     score_ABPRS = Loss_test(support_ABPRS, prs_train, prs_test, pheno_train, pheno_test, theta_train, theta_test)
     score_PRS = Loss_test(NULL, prs_train, prs_test, pheno_train, pheno_test, theta_train, theta_test)
+    ylab = "Loss Score"
   }
   
   #Visualisation
@@ -212,7 +214,7 @@ Plot_Score <- function(support_ABPRS=support_ABPRS, prs_train=prs_train, prs_tes
   plot = p +
     geom_bar(stat="identity", width=0.5) +
     geom_text(aes(label=round(score, 2)), vjust=-0.3, size=3.5) +
-    labs(x="Model", y="AUC Score", fill="Model") +
+    labs(x="Model", y=ylab, fill="Model") +
     #theme_minimal() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           panel.background = element_blank(), axis.line = element_line(colour = "black"))
