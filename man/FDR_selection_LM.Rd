@@ -7,8 +7,8 @@
 FDR_selection_LM(
   prs_train = prs_train,
   prs_val = prs_val,
-  dat_train = dat_train,
-  dat_val = dat_val,
+  pheno_train = pheno_train,
+  pheno_val = pheno_val,
   theta_train = theta_train,
   theta_val = theta_val,
   bigdata = FALSE,
@@ -27,9 +27,9 @@ FDR_selection_LM(
 
 \item{prs_val}{dataframe containing the validation polygenic risk scores}
 
-\item{dat_train}{dataframe containing the training phenotype data}
+\item{pheno_train}{dataframe containing the training phenotype data}
 
-\item{dat_val}{dataframe containing the validation phenotype data}
+\item{pheno_val}{dataframe containing the validation phenotype data}
 
 \item{theta_train}{dataframe containing the training thetas}
 

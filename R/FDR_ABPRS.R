@@ -40,8 +40,8 @@ FDR_control<-function(beta1, beta2, q){
 #'
 #' @param prs_train dataframe containing the training polygenic risk scores
 #' @param prs_val dataframe containing the validation polygenic risk scores
-#' @param dat_train dataframe containing the training phenotype data
-#' @param dat_val dataframe containing the validation phenotype data
+#' @param pheno_train dataframe containing the training phenotype data
+#' @param pheno_val dataframe containing the validation phenotype data
 #' @param theta_train dataframe containing the training thetas
 #' @param theta_val dataframe containing the validation thetas
 #' @param bigdata logical flag indicating whether to use big data optimization 
@@ -65,30 +65,30 @@ FDR_control<-function(beta1, beta2, q){
 #'    - support.list: list of selected support for each lambda value.
 #'    - training_validation_t: matrix of training and validation performance metrics (AUC score)
 #' @export
-FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_train,
-                            dat_val=dat_val, theta_train=theta_train, theta_val=theta_val,
+FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, pheno_train=pheno_train,
+                            pheno_val=pheno_val, theta_train=theta_train, theta_val=theta_val,
                             bigdata=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
                             alpha=0.1, tolerance=0.025, threshold=0.01,err=1e-6, delta=NULL){
   
-  p<-dim(theta_train)[2]
+  p<-ncol(theta_train)
   
   # for training
   df_train_1 <- data.frame(prs=prs_train)
-  mod1 <- glm(dat_train ~ ., data = df_train_1, family="binomial")
+  mod1 <- glm(pheno_train ~ ., data = df_train_1, family="binomial")
   
   # training AUC diff
-  prediction <- prediction(predict(mod1, data=df_train_1, type="response"), dat_train)
+  prediction <- prediction(predict(mod1, data=df_train_1, type="response"), pheno_train)
   mod1_auc <- performance(prediction,measure="auc")@y.values[[1]]
   
   # for validation
   df_val_1 <- data.frame(prs=prs_val)
   
   # validation AUC diff
-  prediction <- prediction(predict(mod1, newdata=df_val_1, type="response"), dat_val)
+  prediction <- prediction(predict(mod1, newdata=df_val_1, type="response"), pheno_val)
   mod1_val_auc <- performance(prediction,measure="auc")@y.values[[1]]
   
   x<-as.matrix(cbind(prs_train,theta_train))
-  y<-dat_train
+  y<-pheno_train
   n<-length(y)
   lam.seq <- exp(seq(log(lam.max),log(lam.min), length =nlambda))
   
@@ -115,7 +115,7 @@ FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_
     if(length(support)>0){
       
       Theta_local<-numeric(p)
-      y<-dat_val
+      y<-pheno_val
       x<-as.matrix(cbind(prs_val,theta_val[,support]))
       if(is.null(delta)){
         fit0<-glm(y~x, family="binomial")
@@ -135,15 +135,15 @@ FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_
       if(length(support1)>0){
         df_train_2 <- data.frame(prs=prs_train, theta_new = theta_train[,support1])
         df_val_2 <- data.frame(prs=prs_val, theta_new = theta_val[,support1])
-        mod2 <- glm(dat_train ~ ., data = df_train_2, family="binomial")
+        mod2 <- glm(pheno_train ~ ., data = df_train_2, family="binomial")
         
         # training AUC diff
-        prediction <- prediction(predict(mod2, data=df_train_2, type="response"), dat_train)
+        prediction <- prediction(predict(mod2, data=df_train_2, type="response"), pheno_train)
         mod2_auc <- performance(prediction,measure="auc")@y.values[[1]]
         training_validation_t[i,1] <- mod2_auc - mod1_auc
         
         # validation AUC diff
-        prediction <- prediction(predict(mod2, newdata=df_val_2, type="response"), dat_val)
+        prediction <- prediction(predict(mod2, newdata=df_val_2, type="response"), pheno_val)
         mod2_val_auc <- performance(prediction,measure="auc")@y.values[[1]]
         training_validation_t[i,2] <- mod2_val_auc - mod1_val_auc
         
@@ -200,8 +200,8 @@ FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_
 #'
 #' @param prs_train dataframe containing the training polygenic risk scores
 #' @param prs_val dataframe containing the validation polygenic risk scores
-#' @param dat_train dataframe containing the training phenotype data
-#' @param dat_val dataframe containing the validation phenotype data
+#' @param pheno_train dataframe containing the training phenotype data
+#' @param pheno_val dataframe containing the validation phenotype data
 #' @param theta_train dataframe containing the training thetas
 #' @param theta_val dataframe containing the validation thetas
 #' @param bigdata logical flag indicating whether to use big data optimization. 
@@ -225,8 +225,8 @@ FDR_selection_GLM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_
 #'    - support.list: list of all selected SNPs
 #'    - training_validation_t: list of AUC scores
 #' @export
-FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_train,
-                           dat_val=dat_val, theta_train=theta_train, theta_val=theta_val, 
+FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, pheno_train=pheno_train,
+                           pheno_val=pheno_val, theta_train=theta_train, theta_val=theta_val, 
                            bigdata=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
                            alpha=0.1, tolerance=0.025,threshold=0.01,err=1e-6, delta=NULL){
   
@@ -234,10 +234,10 @@ FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_t
   
   # for training
   df_train_1 <- data.frame(prs=prs_train)
-  mod1 <- glm(dat_train ~ ., data = df_train_1, family="gaussian")
+  mod1 <- glm(pheno_train ~ ., data = df_train_1, family="gaussian")
   
   # training AUC diff
-  prediction <-(predict(mod1, data=df_train_1, type="response")- dat_train)^2
+  prediction <-(predict(mod1, data=df_train_1, type="response")- pheno_train)^2
   mod1_auc <- mean(prediction)
   
   
@@ -245,12 +245,12 @@ FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_t
   df_val_1 <- data.frame(prs=prs_val)
   
   # validation AUC diff
-  prediction <- (predict(mod1, newdata=df_val_1, type="response")- dat_val)^2
+  prediction <- (predict(mod1, newdata=df_val_1, type="response")- pheno_val)^2
   mod1_val_auc <- mean(prediction)
   
   
   x<-as.matrix(cbind(prs_train,theta_train))
-  y<-dat_train
+  y<-pheno_train
   n<-length(y)
   #Generate a sequence of lambda values that are exponentially spaced between 
   #lam.max and lam.min with nlambda evenly spaced points in between. 
@@ -280,7 +280,7 @@ FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_t
     if(length(support)>0){
       
       Theta_local<-numeric(p)
-      y<-dat_val
+      y<-pheno_val
       x<-as.matrix(cbind(prs_val,theta_val[,support]))
       
       if(is.null(delta)){
@@ -302,15 +302,15 @@ FDR_selection_LM<-function(prs_train=prs_train, prs_val=prs_val, dat_train=dat_t
       if(length(support1)>0){
         df_train_2 <- data.frame(prs=prs_train, theta_new = theta_train[,support1])
         df_val_2 <- data.frame(prs=prs_val, theta_new = theta_val[,support1])
-        mod2 <- glm(dat_train ~ ., data = df_train_2, family="gaussian")
+        mod2 <- glm(pheno_train ~ ., data = df_train_2, family="gaussian")
         
         # training AUC diff
-        prediction <- (predict(mod2, data=df_train_2, type="response")- dat_train)^2
+        prediction <- (predict(mod2, data=df_train_2, type="response")- pheno_train)^2
         mod2_auc <- mean(prediction)
         training_validation_t[i,1] <-  mod1_auc-mod2_auc
         
         # validation AUC diff
-        prediction <- (predict(mod2, newdata=df_val_2, type="response")- dat_val)^2
+        prediction <- (predict(mod2, newdata=df_val_2, type="response")- pheno_val)^2
         mod2_val_auc <- mean(prediction)
         training_validation_t[i,2] <-  mod1_val_auc-mod2_val_auc
         

@@ -8,8 +8,8 @@ Loss_test(
   support,
   prs_train = prs_train,
   prs_test = prs_test,
-  dat_train = dat_train,
-  dat_test = dat_test,
+  pheno_train = pheno_train,
+  pheno_test = pheno_test,
   theta_train = theta_train,
   theta_test = theta_test,
   lasso = FALSE,
@@ -25,9 +25,9 @@ include in the model}
 
 \item{prs_test}{dataframe containing the testing polygenic risk scores}
 
-\item{dat_train}{dataframe containing the training phenotype data}
+\item{pheno_train}{dataframe containing the training phenotype data}
 
-\item{dat_test}{dataframe containing the testing phenotype data}
+\item{pheno_test}{dataframe containing the testing phenotype data}
 
 \item{theta_train}{dataframe containing the training thetas}
 

@@ -64,6 +64,7 @@ learning_betas <- function(pheno=pheno_train, geno=snp_train, prs=prs_train, cov
 #' @return A dataframe with the converted theta SNPs
 #' @export
 convert_theta <- function(geno, betas){
-  geno<-t(t(I(geno==1))*betas$beta1+t(I(geno==2))*betas$beta2)
-  return(geno)
+  theta<-t(t(I(geno==1))*betas$beta1+t(I(geno==2))*betas$beta2)
+  theta=as.data.frame(unclass(theta))
+  return(theta)
 }
