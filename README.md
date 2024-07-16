@@ -30,6 +30,8 @@ devtools::load_all("filepath")
 - FDR_selection_GLM
 - FDR_selection_LM
 - Lasso_selection
+- simulation_generation
+- Plot_Score
 
 # Tasks:
 - Come up with better names
