@@ -8,7 +8,7 @@ learning_betas(
   pheno = pheno_train,
   geno = snp_train,
   prs = prs_train,
-  cov = cov_train,
+  cov = NULL,
   family = "binomial"
 )
 }

@@ -28,8 +28,11 @@ library(data.table)
 #' @return a dataframe whose columns include the SNP rsID number, beta1, beta2, 
 #' and p-value.
 #' @export
-learning_betas <- function(pheno=pheno_train, geno=snp_train, prs=prs_train, cov=cov_train, family="binomial"){
+learning_betas <- function(pheno=pheno_train, geno=snp_train, prs=prs_train, cov=NULL, family="binomial"){
   p <- ncol(geno)
+  if(is.null(cov)){
+    cov <- matrix(nrow=length(pheno), ncol=1, 0)
+  }
   betas <- data.frame(SNP=colnames(geno),beta1=rep(NA,p), beta2=rep(NA,p), pval=rep(NA,p))
   geno<-as.matrix(geno)
   for (i in 1:p){
