@@ -35,4 +35,4 @@ devtools::load_all("filepath")
 # Tasks:
 - Come up with better names
 - Refine descriptions
-- Refine functions
+- Refine functions (eg. FDR_GLM)
