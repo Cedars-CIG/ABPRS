@@ -25,15 +25,14 @@ devtools::load_all("filepath")
 # Current Functions:
 - learning_betas
 - convert_theta
-- AUC_test
-- Loss_test
 - FDR_selection_GLM
 - FDR_selection_LM
 - Lasso_selection
-- simulation_generation
-- Plot_Score
+- binary_simulation
+- split_data
+- Evaluate
 
 # Tasks:
 - Come up with better names
-- See which functions to keep/combine
-- Refine descriptions 
+- Refine descriptions
+- Refine functions
