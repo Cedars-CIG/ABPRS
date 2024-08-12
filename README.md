@@ -24,7 +24,7 @@ Insert Short Description
 
 
 ## Basic Function Usage 
-     ```ruby
+```ruby
      abprs <- ABPRS(target_prs = target_prs, target_genotype=target_genotype, 
                     training_genotype=training_genotype, validation_genotype=validation_genotype,
                     training_prs=training_prs, validation_prs=validation_prs, 
@@ -33,7 +33,7 @@ Insert Short Description
                     lam.max = 0.002, lam.min = 6e-05, nlambda = 50,
                     alpha = 0.1, tolerance = 0.025, threshold = 0.01, err = 1e-05,
                     delta = NULL)
-     ```
+```
 
 ## References
 
