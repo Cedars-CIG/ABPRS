@@ -1,171 +1,156 @@
-library(dplyr)
-library(ROCR)
-library(glmnet)
-library(biglasso)
-library(readr)
-library(data.table)
-library(ggplot2)
-library(ggh4x)
-library(plotly)
-library(tableHTML)
-library(htmlwidgets)
-
-#' Evaluate Function 
-#' @param pheno matrix containing the phenotype information
-#' @param prs1 dataframe containing the first set of polygenic risk scores
-#' @param prs2 dataframe containing the second set of polygenic risk scores
+#' Evaluation Function 
+#' 
+#' This function evaluates the performance of at least one PRS model on the same 
+#' outcome by utilizing various methods, depending on whether the outcome is binary
+#' or continuous. 
+#' 
+#' @param phenotype matrix containing the phenotype information
+#' @param ... dataframes that contain one set of polygenic risk scores each. 
+#' Please provide at least one set of polygenic risk scores. You can provide the 
+#' name of each set of polygenic risk score by providing a name for the parameter 
+#' in this format: \code{model_evaluation(phenotype=phenotype, 'Pre-trained PRS'=df1, 'ABPRS'=df2)}. 
 #' @param binary boolean that determines whether the data is binary or not 
-#' @return A file named "Evaluation.html" would appear in the current directory, 
-#' which contains:
-#' - a downloadable performance score table 
+#' @param filename the name of the exported file
+#' @return An html file with the filename will appear in the current directory,
+#' which contains different plots and data depending on whether the outcome is binary
+#' or continuous. 
+#' 
+#' For Binary Outcomes:
+#' - a downloadable performance score table with AUC scores for each set of PRSs
 #' - an interactable performance score comparison bar plot
 #' - an interactable polygenic risk score distribution density plot
-#' - an interactable case prevalence vs polygenic risk score graph
-#' - the ggplot code and downloadable dataframe that produced the above plots
+#' - an interactable percentage of cases vs polygenic risk score graph
+#' - an interactable odds ratio plot
+#' - the legend, ggplot code, and downloadable dataframe that produced the above plots
+#' 
+#' 
+#' For Continuous Outcomes: 
+#' - a downloadable performance score table with the Mean-Squared Error and \eqn{R^2}
+#' for each set of PRSs
+#' - an interactable performance score comparison bar plot
+#' - an interactable mean phenotype vs polygenic risk score percentile graph
+#' - an interactable mean difference plot
+#' - the legend, ggplot code, downloadable dataframe that produced the above plots
+#' 
 #' @export
 #' 
-Evaluate <- function(pheno, prs1, prs2, binary=TRUE){
+model_evaluation <- function(phenotype, ..., binary=TRUE){
   
-  prs1 <- as.data.frame(prs1)
-  prs2 <- as.data.frame(prs2)
-
-  #Calculate Performance Score
-  if(binary){
-    mod1 <- glm(pheno~., data=prs1, family="binomial")
-    mod2 <- glm(pheno~., data=prs2, family="binomial")
-    score1 <- AUC_Score(prs1, pheno, mod1)
-    score2 <- AUC_Score(prs2, pheno, mod2)
-    Scores <- data.frame(Model=c("Model 1","Model 2"), AUC=c(score1, score2))
-    ylab <- "AUC"
-  }else{
-    mod1 <- glm(pheno~., data=prs1, family="gaussian")
-    mod2 <- glm(pheno~., data=prs2, family="gaussian")
-    score_MSE1 <- MSE_Score(df1, pheno, mod1)
-    score_MSE2 <- MSE_Score(df2, pheno, mod2)
-    score_R1 <- summary(mod1)$r.squared
-    score_R2 <- summary(mod2)$r.squared
-    Scores <- data.frame(Model=c("Model 1","Model 2"), MSE=c(score_MSE1, score_MSE2), R_Squared=c(score_R1, score_R2))
-    ylab = "MSE"
+  #Retrieve PRS Scores
+  all_prs <- list(...)
+  all_prs <- lapply(all_prs, function(x) as.data.frame(x))
+  # Ensure at least one PRS score is provided
+  if (length(all_prs) == 0) {
+    stop("At least one PRS score must be provided.")
   }
   
-  convert_df_to_string <- function(df) {
-    column_names <- colnames(df)
-    header <- paste(column_names, collapse = ",")
-    body <- apply(df, 1, function(row) paste(row, collapse = ",")) 
-    result <- paste(header, paste(body, collapse = "\\n"), sep = "\\n")
-    return(result)
+  #Retrieve Names 
+  call <- match.call()
+  call_list <- as.list(call)
+  all_names <- names(call_list)[-c(1,2)] 
+  if(any(nchar(all_names)==0)){
+    all_names <- paste0("PRS", 1:length(all_prs))
   }
   
-  #BarPlot 
-  BarPlot <- Plot_Score(Scores, ylab)
-  saveWidget(BarPlot, "BarPlot.html", selfcontained = TRUE)
-  
-  #Change Score to 3 dp and convert to CSV string
-  Scores[,2] = round(Scores[,2],3)
-  scores_csv <- convert_df_to_string(Scores)
-  
-  #DensityPlot
-  DensityPlot = Density_Plot(pheno, prs1, prs2)
-  saveWidget(DensityPlot, "DensityPlot.html", selfcontained = TRUE)
-  PRS <- data.frame(PRS1=prs1, PRS2=prs2)
-  prs_csv <- convert_df_to_string(PRS)
-  
-  #PrevalencePlot
-  prev_data = Prevalence_Data(pheno, prs1, prs2, 15)
-  prev_csv <- convert_df_to_string(prev_data)
-  PrevalencePlot = Prevalence_Plot(prev_data)
-  saveWidget(PrevalencePlot, "PrevalencePlot.html", selfcontained = TRUE)
-
-  # ggplot Code String
-  barplot_code <- "
-  p <- ggplot(data = df, aes(x = reorder(Model, +score), y = score, fill = Model))
-  plot <- p +
-    geom_bar(stat = 'identity', width = 0.5) +
-    geom_text(aes(label = round(score, 2)), size = 3.5, vjust = -0.3) +
-    scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
-    labs(x = 'Model', y = ylab, fill = 'Model') +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          panel.background = element_blank(), axis.line = element_line(colour = 'black')) +
-    scale_fill_manual(values = c('#ef8a62', '#67a9cf'))"
-  
-  densityplot_code <- "
-  df<-data.frame(Phenotype,PRS,Method)
-  p<-ggplot(df,aes(x=PRS, fill=Phenotype))
-  plot<- p +
-    geom_density(alpha=0.5) +
-    scale_fill_manual(values = c('#ef8a62', '#67a9cf')) +
-    labs(x='Standardized PRS', y='Density') +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          panel.background = element_blank(), axis.line.x = element_line(colour = 'black')) + 
-    facet_grid(cols=vars(Method),scales='free_x')"
-  
-  prevalence_code <- "
-  plot <- ggplot(Prevalence_Data, aes(x = Percentile, y = Prevalence, color=Type)) +
-    geom_point(size = 3) +
-    labs(x = 'Risk Score Percentile', y = 'Case Prevalence',
-    title = 'Case Prevalence vs. Risk Score Percentile') +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          panel.background = element_blank(), axis.line = element_line(colour = 'black')) + 
-    scale_color_manual(values = c('PRS1' = '#ef8a62', 'PRS2' = '#67a9cf'))"
-  
-  cat(
-    paste(
-      
-      "<!DOCTYPE html>
-<html>
-<head>
-<title>Evaluation</title>
-
-<style>
-
+  style <- "<style>
   body { font-family: Arial, sans-serif; }
   pre { background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
   iframe { display: block; margin: 0 auto; border:none;}
+  button { background-color: lightblue; border: none; color: black; 
+  padding: 10px 20px; text-align: center; text-decoration: none; 
+  display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; }
+  button:hover { background-color: #2c7bb6; }
+  table { width: 50%; border: 1px solid;}
+  th { background-color: lightblue; border: 1px solid; padding: 8px;}
+  td {border: 1px solid; padding: 8px;}
+</style>"
   
-  button {
-      background-color: lightblue; /* Blue background */
-        border: none; /* Remove borders */
-        color: black; /* Black text */
-        padding: 10px 20px; /* Some padding */
-        text-align: center; /* Centered text */
-        text-decoration: none; /* Remove underline */
-        display: inline-block; /* Inline block */
-        font-size: 16px; /* Set font size */
-        margin: 4px 2px; /* Some margins */
-        cursor: pointer; /* Pointer cursor on hover */
-    }
-  button:hover {
-    background-color: #2c7bb6; /* Darker blue on hover */
+  if(binary){
+    html_binary(phenotype, all_prs, all_names, style)
+  }else{
+    html_continuous(phenotype, all_prs, all_names, style)
   }
   
-  table {
-    width: 50%;
-    border: 1px solid;
-  }
-  
-  th {
-    background-color: lightblue; 
-    border: 1px solid; 
-    padding: 8px;
-  }
-  
-  td {
-    border: 1px solid; 
-    padding: 8px;
-  }
-  
-</style>
+  return("Done")
+}
 
-<script>
+html_binary<- function(phenotype, all_prs, all_names, style){
+  
+  n_model <- length(all_names)
+  
+  # PLOT 1: Performance Scores Comparison
+  all_auc <- sapply(all_prs, function(prs) AUC_Score(prs, phenotype))
+  PerformanceScores <- data.frame(Model=all_names, AUC=all_auc)
+  ylab <- "AUC"
+  BarPlot <- Plot_Score(PerformanceScores, ylab)
+  barplot_code <- "
+   plot <- ggplot(data=Scores, aes(x=reorder(Model, +Score), y=Score, fill=Model)) +
+    geom_bar(stat=\"identity\", width=0.5) +
+    geom_text(aes(label=round(Score, 2)), size=3.5, vjust=-0.3) +
+    scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
+    labs(x=\"Model\", y=ylab, fill=\"Model\") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\")) +
+    scale_fill_manual(values = setNames(c(\"#ef8a62\", \"#67a9cf\"), c(name1, name2)))"
+  saveWidget(BarPlot, "BarPlot.html", selfcontained = TRUE)
+  PerformanceScores[,2]<- round(PerformanceScores[,2], 3)
+  scores_csv <- convert_df_to_string(PerformanceScores)
+  
+  # PLOT 2: Density Plots
+  Phenotype<-as.factor(rep(phenotype,n_model))
+  Standardized_PRS<-unlist(lapply(all_prs, scale))
+  Method<-rep(all_names, each=length(phenotype))
+  PRSTable<-data.frame(Phenotype,Standardized_PRS,Method)
+  DensityPlot <- Density_Plot(PRSTable, all_names)
+  densityplot_code <- "
+    StandardizedPRS$Method <- factor(StandardizedPRS$Method, levels = c(name1, name2))
+    plot<-ggplot(StandardizedPRS,aes(x=PRS, fill=Phenotype))+
+      geom_density(alpha=0.5)+
+      scale_fill_manual(values = c(\"#67a9cf\", \"#ef8a62\"))+
+    labs(x=\"Standardized PRS\", y=\"Density\") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+            panel.background = element_blank(), axis.line.x = element_line(colour = \"black\")) + 
+    facet_grid(cols=vars(Method),scales=\"free_x\")"
+  saveWidget(DensityPlot, "DensityPlot.html", selfcontained = TRUE)
+  prs_csv <- convert_df_to_string(PRSTable)
+  
+  # PLOT 3: Percentage of Cases vs. PRS Percentile
+  prev_data = Prevalence_Data(phenotype, all_prs, all_names, 15)
+  prev_csv <- convert_df_to_string(prev_data)
+  PrevalencePlot = Prevalence_Plot(prev_data)
+  prevalence_code <- "
+  plot <- ggplot(PrevalenceData, aes(x = Percentile, y = Prevalence, color=Model)) +
+    geom_point(size = 3) +
+    labs(x = \"Risk Score Percentile\", y = \"Case Prevalence\",
+         title = \"Case Prevalence vs. Risk Score Percentile\") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\")) + 
+    scale_color_manual(values = setNames(c(\"#ef8a62\", \"#67a9cf\"), c(name1, name2)))"
+  saveWidget(PrevalencePlot, "PrevalencePlot.html", selfcontained = TRUE)
+  
+  # PLOT 4: Odds Ratio Plot
+  #TBA
+  
+  cat(
+    paste(
+
+"<!DOCTYPE html>
+<html>
+<head>
+<title>Evaluation</title>",
+
+style,
+
+"<script>
 
 var csv1 = \"", scores_csv, "\"
-var filename1 = \"Score.csv\"
+var filename1 = \"PerformanceScores.csv\"
 
 var csv2 = \"", prs_csv, "\"
-var filename2 = \"prs.csv\"
+var filename2 = \"StandardizedPRS.csv\"
 
 var csv3 = \"", prev_csv, "\"
-var filename3 = \"Prevalence.csv\"
+var filename3 = \"PrevalenceData.csv\"
 
 function download_csv_file(csv, filename) {
     var hiddenElement = document.createElement('a');
@@ -180,81 +165,176 @@ function download_csv_file(csv, filename) {
 
 </head>
 
-
 <body>
 
 <h1><center>Evaluation Results</center></h1>
 
 <h2>Performance Score Table</h2>",
-tableHTML(Scores),
-"<button onclick=\"download_csv_file(csv1, filename1)\">Download Score.csv</button>",
+tableHTML(PerformanceScores),
+"<button onclick=\"download_csv_file(csv1, filename1)\">Download PerformanceScores.csv</button>",
 
 "<h2>Performance Score Comparisons</h2>",
 "<iframe src='BarPlot.html' width='800' height='500'></iframe>",
 "<pre><code>", barplot_code, "</code></pre>",
 
 "<h2>Polygenic Risk Score Distributions</h2>
- <iframe src='DensityPlot.html' width='800' height='500'></iframe>",
-"<button onclick=\"download_csv_file(csv2, filename2)\">Download prs.csv</button>",
+    <iframe src='DensityPlot.html' width='800' height='500'></iframe>",
+"<button onclick=\"download_csv_file(csv2, filename2)\">Download StandardizedPRS.csv</button>",
 "<pre><code>", densityplot_code, "</code></pre>",
 
-"<h2>Case Prevalence vs. Polygenic Risk Score</h2>
+"<h2>Phenotype vs PRS Percentile</h2>
  <iframe src='PrevalencePlot.html' width='800' height='500'></iframe>",
-"<button onclick=\"download_csv_file(csv3, filename3)\">Download Prevalence.csv</button>",
+"<button onclick=\"download_csv_file(csv3, filename3)\">Download PrevalenceData.csv</button>",
 "<pre><code>", prevalence_code, "</code></pre>",
 
 "</body>
 </html>"), 
 
 file = "Evaluation.html")
-  
-  return("Done")
 }
 
-#Calculate AUC score from data
-AUC_Score<-function(prs, pheno, mod){
-  # Obtain predictions
-  prediction <- prediction(predict(mod, prs, type="response"), pheno)
-  # Find auc score from prediction
-  auc <- performance(prediction, measure="auc")@y.values[[1]]
-  return(auc)
+html_continuous <- function(phenotype, all_prs, all_names, style){
+  
+  n_model <- length(all_names)
+  
+  # Plot1: Performance Score Plot
+  all_mse <- sapply(all_prs, function(prs) MSE_Score(prs, phenotype))
+  all_r2 <- sapply(all_prs, function(prs) RSquared_Score(prs, phenotype))
+  PerformanceScores <- data.frame(Model=all_names, MSE=all_MSE, `R-Squared`=all_r2)
+  ylab = "MSE"
+  BarPlot <- Plot_Score(PerformanceScores[,c(1:2)], ylab)
+  barplot_code <- "
+   plot <- ggplot(data=Scores, aes(x=reorder(Model, +Score), y=Score, fill=Model)) +
+    geom_bar(stat=\"identity\", width=0.5) +
+    geom_text(aes(label=round(Score, 2)), size=3.5, vjust=-0.3) +
+    scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
+    labs(x=\"Model\", y=ylab, fill=\"Model\") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\")) +
+    scale_fill_manual(values = setNames(c(\"#ef8a62\", \"#67a9cf\"), c(name1, name2)))"
+  saveWidget(BarPlot, "BarPlot.html", selfcontained = TRUE)
+  PerformanceScores[,c(2,3)]<- round(PerformanceScores[,c(2,3)], 3)
+  scores_csv <- convert_df_to_string(PerformanceScores)
+  
+  # Plot 2: Mean of Phenotype vs. Risk Score Percentile
+  MeanPheno <- data.frame(TBA=c("TBA", "TBA"))
+  
+  # Plot 3: Mean Difference Plot
+  MeanDiff <- data.frame(TBA=c("TBA", "TBA"))
+  
+  cat(
+    paste(
+      
+"<!DOCTYPE html>
+<html>
+<head>
+<title>Evaluation</title>",
+      
+style,
+      
+"<script>
+
+var csv1 = \"", scores_csv, "\"
+var filename1 = \"PerformanceScores.csv\"
+
+# var csv2 = \"", prs_csv, "\"
+# var filename2 = \"StandardizedPRS.csv\"
+# 
+# var csv3 = \"", prev_csv, "\"
+# var filename3 = \"PrevalenceData.csv\"
+
+function download_csv_file(csv, filename) {
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+    
+    //provide the name for the CSV file to be downloaded
+    hiddenElement.download = filename;
+    hiddenElement.click();
+}
+</script>
+
+</head>
+
+<body>
+
+<h1><center>Evaluation Results</center></h1>
+
+<h2>Performance Score Table</h2>",
+tableHTML(PerformanceScores),
+"<button onclick=\"download_csv_file(csv1, filename1)\">Download PerformanceScores.csv</button>",
+
+"<h2>Performance Score Comparisons</h2>",
+"<iframe src='BarPlot.html' width='800' height='500'></iframe>",
+"<pre><code>", barplot_code, "</code></pre>",
+
+# "<h2>Polygenic Risk Score Distributions</h2>
+#     <iframe src='DensityPlot.html' width='800' height='500'></iframe>",
+# "<button onclick=\"download_csv_file(csv2, filename2)\">Download StandardizedPRS.csv</button>",
+# "<pre><code>", densityplot_code, "</code></pre>",
+# 
+# "<h2>Phenotype vs PRS Percentile</h2>
+#  <iframe src='PrevalencePlot.html' width='800' height='500'></iframe>",
+# "<button onclick=\"download_csv_file(csv3, filename3)\">Download PrevalenceData.csv</button>",
+# "<pre><code>", prevalence_code, "</code></pre>",
+
+"</body>
+</html>"), 
+
+file = "Evaluation.html")
 }
 
-#Calculate MSE score from data
-MSE_Score<-function(prs, pheno, mod){
-  prediction <- (predict(mod, x, type="response")- y)^2
-  mse <- mean(prediction)
-  return(mse)
+convert_df_to_string <- function(df) {
+  column_names <- colnames(df)
+  header <- paste(column_names, collapse = ",")
+  body <- apply(df, 1, function(row) paste(row, collapse = ",")) 
+  result <- paste(header, paste(body, collapse = "\\n"), sep = "\\n")
+  return(result)
 }
 
-Plot_Score <- function(df, ylab){
-  colnames(df) = c("Model", "Score")
-  
-  p<-ggplot(data=df, aes(x=reorder(Model, +Score), y=Score, fill=Model))
-  
-  plot <- p +
+Plot_Score <- function(PerformanceScores, ylab){
+  colnames(PerformanceScores) = c("Model", "Score")
+  plot <- ggplot(data=PerformanceScores, aes(x=reorder(Model, +Score), y=Score, fill=Model)) +
     geom_bar(stat="identity", width=0.5) +
     geom_text(aes(label=round(Score, 2)), size=3.5, vjust=-0.3) +
     scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
     labs(x="Model", y=ylab, fill="Model") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          panel.background = element_blank(), axis.line = element_line(colour = "black")) +
-    #theme(element_text(margin=margin(b=50))) +
-    scale_fill_manual(values = c("#ef8a62", "#67a9cf"))
-  
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) #+
+    #scale_fill_manual(values = setNames(c("#ef8a62", "#67a9cf"), c(name1, name2)))
   fig <- ggplotly(plot)
-  
   return(fig)
 }
 
-Density_Plot <- function(pheno, prs1, prs2){
-  Phenotype<-as.factor(c(pheno, pheno))
-  PRS<-c(c(scale(prs1)),c(scale(prs2)))
-  Method<-rep(c("PRS1","PRS2"), each=length(pheno))
-  df<-data.frame(Phenotype,PRS,Method)
-  p<-ggplot(df,aes(x=PRS, fill=Phenotype))
-  plot<-p+geom_density(alpha=0.5)+
-    scale_fill_manual(values = c("#ef8a62", "#67a9cf"))+
+#Calculate AUC score from data
+AUC_Score<-function(prs, pheno){
+  # Create prediction model, obtain predictions, calculate AUC score from prediction
+  mod <- glm(pheno~., data=prs, family="binomial")
+  prediction <- prediction(predict(mod, prs, type="response"), pheno)
+  auc <- performance(prediction, measure="auc")@y.values[[1]]
+  return(auc)
+}
+
+#Calculate MSE score from data
+MSE_Score<-function(prs, pheno){
+  mod <- lm(pheno~., data=prs)
+  prediction <- (predict(mod, prs, type="response")- pheno)^2
+  mse <- mean(prediction)
+  return(mse)
+}
+
+#Calculate R Squared from data
+RSquared_Score <- function(prs, pheno){
+  mod <- lm(pheno~., data=prs)
+  r2 <- summary(mod)$r.squared
+  return(r2)
+}
+
+Density_Plot <- function(PRSTable, model_names){
+  PRSTable$Method <- factor(PRSTable$Method, levels = model_names)
+  plot<-ggplot(PRSTable,aes(x=Standardized_PRS, fill=Phenotype))+
+    geom_density(alpha=0.5)+
+    scale_fill_manual(values = c("#67a9cf", "#ef8a62"))+
     labs(x="Standardized PRS", y="Density") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           panel.background = element_blank(), axis.line.x = element_line(colour = "black")) + 
@@ -263,42 +343,42 @@ Density_Plot <- function(pheno, prs1, prs2){
   return(fig)
 }
 
-Prevalence_Data <- function(pheno, prs1, prs2, n){
+Prevalence_Data <- function(pheno, all_prs, all_names, n){
   
-  percentile1 <- ecdf(as.matrix(prs1))(as.matrix(prs1)) * 100
-  percentile2 <- ecdf(as.matrix(prs2))(as.matrix(prs2)) * 100
+  all_prevalence_data <- data.frame()
   
-  data <- data.frame(Percentile1 = percentile1, Percentile2 = percentile2, 
-                     Phenotype = pheno)
+  # Loop over each PRS vector
+  for (i in seq_along(all_prs)) {
+    prs <- as.numeric(all_prs[[i]][,1])
+    name <- all_names[i]
+    
+    percentile <- ecdf(as.matrix(prs))(as.matrix(prs)) * 100
+    
+    data <- data.frame(Percentile = percentile, Phenotype = pheno)
+    
+    # Calculate Prevalence
+    prevalence <- data %>%
+      mutate(Percentile = ntile(Percentile, n)/n) %>%
+      group_by(Percentile) %>%
+      summarize(Prevalence = mean(Phenotype)) %>%
+      mutate(Model = name)
+    
+    # Combine the current prevalence data with the accumulated data
+    all_prevalence_data <- rbind(all_prevalence_data, prevalence)
+  }
   
-  #Calculate Prevalance
-  prevalence1 <- data %>%
-    mutate(Percentile = ntile(Percentile1, n)/n) %>%
-    group_by(Percentile) %>%
-    summarize(Prevalence = mean(Phenotype))
-  
-  prevalence2 <- data %>%
-    mutate(Percentile = ntile(Percentile2, n)/n) %>%
-    group_by(Percentile) %>%
-    summarize(Prevalence = mean(Phenotype))
-  
-  
-  Prevalence_Data <- rbind(prevalence1, prevalence2)
-  Type = rep(c("PRS1", "PRS2"), each=n)
-  Prevalence_Data <- cbind(Prevalence_Data, Type=Type)
-  return(Prevalence_Data)
+  return(all_prevalence_data)
 }
 
-Prevalence_Plot <- function(Prevalence_Data){
+Prevalence_Plot <- function(PrevalenceData){
   
-  plot <- ggplot(Prevalence_Data, aes(x = Percentile, y = Prevalence, color=Type)) +
+  plot <- ggplot(PrevalenceData, aes(x = Percentile, y = Prevalence, color=Model)) +
     geom_point(size = 3) +
-    labs(x = "Risk Score Percentile", y = "Case Prevalence",
-         title = "Case Prevalence vs. Risk Score Percentile") +
+    labs(x = "Risk Score Percentile", y = "Percentage of Cases",
+         title = "Percentage of Cases vs. Risk Score Percentile")+
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          panel.background = element_blank(), axis.line = element_line(colour = "black")) + 
-    scale_color_manual(values = c("PRS1" = "#ef8a62", "PRS2" = "#67a9cf"))
-  
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) #+ 
+    #scale_color_manual(values = setNames(c("#ef8a62", "#67a9cf"), c(name1, name2)))
   fig <- ggplotly(plot)
   
   return(fig)
