@@ -24,7 +24,6 @@ Insert Short Description
 
 
 ## Basic Function Usage 
-
      ```ruby
      abprs <- ABPRS(target_prs = target_prs, target_genotype=target_genotype, 
                     training_genotype=training_genotype, validation_genotype=validation_genotype,
