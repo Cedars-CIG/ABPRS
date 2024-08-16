@@ -4,6 +4,24 @@ Insert Short Description
 
 ## Installation and Loading
 
+Now: since it's a private package, you will have to download and load the package. 
+
+1. Download the folder on github
+2. Then, you can either just load it or install it in your R environment.
+
+     Option1: 
+     ```ruby
+     devtools::load_all("filepath")
+     ```
+
+     Option2:
+     ```ruby
+     devtools::install("filepath")
+     library(ABPRS)
+     ```
+
+For Later:
+
 1. To install in R library, use:
      ```ruby
      devtools::install_github("oreomilk2005/ABPRS")
