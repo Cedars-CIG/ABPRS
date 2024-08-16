@@ -4,20 +4,12 @@
 \alias{data_simulation}
 \title{Generate Simulation Data}
 \usage{
-data_simulation(
-  snps_n,
-  effect_snps_vec,
-  sample_n,
-  maf,
-  effect_size,
-  beta0,
-  binary = TRUE
-)
+data_simulation(m, effect_snps_vec, n, maf, effect_size, beta0, binary = TRUE)
 }
 \arguments{
-\item{snps_n}{total number of snps}
+\item{m}{total number of snps}
 
-\item{sample_n}{total number of samples}
+\item{n}{total number of samples}
 
 \item{effect_size}{effect size of the effective snps}
 
@@ -35,5 +27,5 @@ simulated genotype encoding in the rest of the columns.
 }
 \description{
 This function generates simulated genotype and phenotype information for
-\emph{snps_n} amount of snps and \emph{sample_n} amount of individuals.
+\emph{m} amount of snps and \emph{n} amount of individuals.
 }

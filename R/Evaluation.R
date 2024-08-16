@@ -1,3 +1,15 @@
+library(dplyr)
+library(ROCR)
+library(glmnet)
+library(biglasso)
+library(readr)
+library(data.table)
+library(ggplot2)
+library(ggh4x)
+library(plotly)
+library(tableHTML)
+library(htmlwidgets)
+
 #' Evaluation Function 
 #' 
 #' This function evaluates the performance of at least one PRS model on the same 
@@ -48,12 +60,14 @@ model_evaluation <- function(phenotype, ..., binary=TRUE){
   call <- match.call()
   call_list <- as.list(call)
   all_names <- names(call_list)[-c(1,2)] 
+  all_names <- all_names[-length(all_names)]
   if(any(nchar(all_names)==0)){
     all_names <- paste0("PRS", 1:length(all_prs))
   }
   
   style <- "<style>
   body { font-family: Arial, sans-serif; }
+  div {max-width:800px; margin-inline: auto; margin-top:10px;}
   pre { background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
   iframe { display: block; margin: 0 auto; border:none;}
   button { background-color: lightblue; border: none; color: black; 
@@ -175,15 +189,27 @@ tableHTML(PerformanceScores),
 
 "<h2>Performance Score Comparisons</h2>",
 "<iframe src='BarPlot.html' width='800' height='500'></iframe>",
+"<div>This barplot compares the", ylab ,"performance score between different 
+sets of PRSs derived from different models. The models are ordered by increasing 
+performance score. </div>",
 "<pre><code>", barplot_code, "</code></pre>",
 
 "<h2>Polygenic Risk Score Distributions</h2>
-    <iframe src='DensityPlot.html' width='800' height='500'></iframe>",
+<iframe src='DensityPlot.html' width='800' height='500'></iframe>",
+"<div>The figure shows the density curves of the PRS of control (0) and case (1) 
+phenotype for each set of PRS. The PRSs are standardized with a mean of 0 and 
+standard deviation of 1 for each set. The goal of this figure is to see how well
+the polygenic risk scores can distinguish between case and control. </div>",
 "<button onclick=\"download_csv_file(csv2, filename2)\">Download StandardizedPRS.csv</button>",
 "<pre><code>", densityplot_code, "</code></pre>",
 
 "<h2>Phenotype vs PRS Percentile</h2>
  <iframe src='PrevalencePlot.html' width='800' height='500'></iframe>",
+"<div>The figure plots percentage of cases(prevalence) against the risk score percentile
+for PRSs derived from different models. For each model, 15 quantiles are plotted 
+in the graph. A model that performs better should have a higher prevalence in the
+higher risk score percentiles and a lower prevalence in the lower percentiles.  
+</div>",
 "<button onclick=\"download_csv_file(csv3, filename3)\">Download PrevalenceData.csv</button>",
 "<pre><code>", prevalence_code, "</code></pre>",
 

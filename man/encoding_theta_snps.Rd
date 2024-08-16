@@ -2,7 +2,7 @@
 % Please edit documentation in R/Thetas.R
 \name{encoding_theta_snps}
 \alias{encoding_theta_snps}
-\title{Convert Additive Encoding to Theta SNP Encoding}
+\title{Convert SNPs to \eqn{\theta_{SNP}} Encoding}
 \usage{
 encoding_theta_snps(genotype, thetas)
 }
@@ -14,7 +14,7 @@ and aa (theta2) (See \link{learning_theta_snps} for the function to generate
 this dataframe).}
 }
 \value{
-A dataframe containing the SNPs with theta encoding.
+A dataframe containing genotype matrix with theta encoding.
 }
 \description{
 This function converts a genotype matrix with additive encoding into a

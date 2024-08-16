@@ -5,26 +5,25 @@ library(biglasso)
 library(readr)
 library(data.table)
 
-#' Compute Theta SNPs for ABPRS
+#' Compute \eqn{\theta_{SNPs}} for ABPRS
 #'
-#' This function computes theta SNPs and their corresponding p-values for each SNP.
+#' This function computes \eqn{\theta_{SNPs}} and their corresponding p-values for each SNP.
 #' Specifically, the function fits a regression model to the phenotype outcome using the
 #' genotype, PRS, and covariates. The function uses a binomial model for binary
 #' outcomes and a Gaussian model for continuous outcomes.
 #' 
 #' @param phenotype a dataframe containing the phenotype
-#' @param prs a dataframe containing the polygenic risk scores 
+#' @param pre_trained_prs a dataframe containing the pre-trained polygenic risk scores 
 #' @param genotype a dataframe containing the genotype matrix with additive encoding
 #' whose columns represent SNPs and rows represent individuals.
 #' @param covariate a dataframe containing covariates (default: NULL)
-#' @param family a string describing the category of phenotype in the dataset. 
-#' Use "binary" for binary outcomes and "continuous" for continuous outcomes
-#' (default: "binary").
+#' @param family a string specifying the type of model to fit a \link[stats]{glm}.
+#' Use "binomial" for binary outcomes and "gaussian" for continuous outcomes.
 #' @return A dataframe whose columns include the SNP rsID, theta1 (theta encoding 
 #' for heterozygous alleles Aa), theta2 (theta encoding for homozygous alternative 
-#' alleles aa), and p-value.
+#' alleles aa), and the p-value associated with \eqn{\theta_{SNPs}} and the outcome.
 #' @export
-learning_theta_snps <- function(phenotype, genotype, prs, covariate=NULL, family="binary"){
+learning_theta_snps <- function(phenotype, genotype, pre_trained_prs, covariate=NULL, family){
   
   if(family == "binary"){
     family <- "binomial"
@@ -41,7 +40,7 @@ learning_theta_snps <- function(phenotype, genotype, prs, covariate=NULL, family
   for (i in 1:p){
     geno_f <- as.factor(genotype[,i])
     if(length(levels(geno_f))>1){
-      df <- data.frame(y = phenotype, geno_f, prs, covariate)
+      df <- data.frame(y = phenotype, geno_f, pre_trained_prs, covariate)
       #Generalized Linear Model
       mod <- glm(y ~ ., data=df, family = family)
       #Retrieve theta1 and theta2
@@ -49,7 +48,7 @@ learning_theta_snps <- function(phenotype, genotype, prs, covariate=NULL, family
       thetas[i,3] <- summary(mod)$coef[3,1]
       theta <- ifelse(genotype[,i]==0 , 0,
                       ifelse(genotype[,i] == 1, thetas[i,2], thetas[i,3]))
-      df <- data.frame(y = phenotype, theta, prs)
+      df <- data.frame(y = phenotype, theta, pre_trained_prs)
       mod <- glm( y~ ., data=df, family = family)
       thetas[i,4] <- summary(mod)$coef[2,4]
       #if (i %% 100 == 0) {print(paste("SNP", i, "theta done."))}
@@ -58,7 +57,7 @@ learning_theta_snps <- function(phenotype, genotype, prs, covariate=NULL, family
   return(thetas)
 }
 
-#' Convert Additive Encoding to Theta SNP Encoding
+#' Convert SNPs to \eqn{\theta_{SNP}} Encoding
 #'
 #' This function converts a genotype matrix with additive encoding into a
 #' theta-encoded matrix. It replaces the encoding of heterozygous alleles (Aa) 
@@ -69,7 +68,7 @@ learning_theta_snps <- function(phenotype, genotype, prs, covariate=NULL, family
 #' @param thetas a dataframe containing theta encoding for genotype Aa (theta1) 
 #' and aa (theta2) (See \link{learning_theta_snps} for the function to generate 
 #' this dataframe).
-#' @return A dataframe containing the SNPs with theta encoding. 
+#' @return A dataframe containing genotype matrix with theta encoding. 
 #' @export
 encoding_theta_snps <- function(genotype, thetas){
   encoded_theta<-t(t(I(genotype==1))*thetas$theta1+t(I(genotype==2))*thetas$theta2)

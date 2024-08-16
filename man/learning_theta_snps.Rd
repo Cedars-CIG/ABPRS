@@ -2,14 +2,14 @@
 % Please edit documentation in R/Thetas.R
 \name{learning_theta_snps}
 \alias{learning_theta_snps}
-\title{Compute Theta SNPs for ABPRS}
+\title{Compute \eqn{\theta_{SNPs}} for ABPRS}
 \usage{
 learning_theta_snps(
   phenotype,
   genotype,
-  prs,
+  pre_trained_prs,
   covariate = NULL,
-  family = "binary"
+  family
 )
 }
 \arguments{
@@ -18,21 +18,20 @@ learning_theta_snps(
 \item{genotype}{a dataframe containing the genotype matrix with additive encoding
 whose columns represent SNPs and rows represent individuals.}
 
-\item{prs}{a dataframe containing the polygenic risk scores}
+\item{pre_trained_prs}{a dataframe containing the pre-trained polygenic risk scores}
 
 \item{covariate}{a dataframe containing covariates (default: NULL)}
 
-\item{family}{a string describing the category of phenotype in the dataset.
-Use "binary" for binary outcomes and "continuous" for continuous outcomes
-(default: "binary").}
+\item{family}{a string specifying the type of model to fit a \link[stats]{glm}.
+Use "binomial" for binary outcomes and "gaussian" for continuous outcomes.}
 }
 \value{
 A dataframe whose columns include the SNP rsID, theta1 (theta encoding
 for heterozygous alleles Aa), theta2 (theta encoding for homozygous alternative
-alleles aa), and p-value.
+alleles aa), and the p-value associated with \eqn{\theta_{SNPs}} and the outcome.
 }
 \description{
-This function computes theta SNPs and their corresponding p-values for each SNP.
+This function computes \eqn{\theta_{SNPs}} and their corresponding p-values for each SNP.
 Specifically, the function fits a regression model to the phenotype outcome using the
 genotype, PRS, and covariates. The function uses a binomial model for binary
 outcomes and a Gaussian model for continuous outcomes.

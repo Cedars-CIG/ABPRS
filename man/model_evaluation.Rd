@@ -7,14 +7,14 @@
 model_evaluation(phenotype, ..., binary = TRUE)
 }
 \arguments{
+\item{phenotype}{matrix containing the phenotype information}
+
 \item{...}{dataframes that contain one set of polygenic risk scores each.
 Please provide at least one set of polygenic risk scores. You can provide the
 name of each set of polygenic risk score by providing a name for the parameter
 in this format: \code{model_evaluation(phenotype=phenotype, 'Pre-trained PRS'=df1, 'ABPRS'=df2)}.}
 
 \item{binary}{boolean that determines whether the data is binary or not}
-
-\item{pheno}{matrix containing the phenotype information}
 
 \item{filename}{the name of the exported file}
 }

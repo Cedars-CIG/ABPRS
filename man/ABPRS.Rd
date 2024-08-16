@@ -5,15 +5,13 @@
 \title{ABPRS Function}
 \usage{
 ABPRS(
-  target_prs,
-  target_genotype,
-  training_genotype,
-  validation_genotype,
-  training_prs,
+  pre_trained_prs,
   validation_prs,
   training_phenotype,
   validation_phenotype,
-  family = "binary",
+  training_genotype,
+  validation_genotype,
+  family,
   biglasso = FALSE,
   lam.max = 0.002,
   lam.min = 6e-05,
@@ -26,27 +24,20 @@ ABPRS(
 )
 }
 \arguments{
-\item{target_prs}{dataframe containing the pre-trained prs that we wish to
-convert}
+\item{pre_trained_prs}{dataframe containing the pre-trained training polygenic risk scores}
 
-\item{target_genotype}{dataframe containing the genotype information of the
-target sample}
-
-\item{training_genotype}{dataframe containing the training genotype data}
-
-\item{validation_genotype}{dataframe containing the validation genotype data}
-
-\item{training_prs}{dataframe containing the training polygenic risk scores}
-
-\item{validation_prs}{dataframe containing the validation polygenic risk scores}
+\item{validation_prs}{dataframe containing the pre-trained validation polygenic risk scores}
 
 \item{training_phenotype}{dataframe containing the training phenotype data}
 
 \item{validation_phenotype}{dataframe containing the validation phenotype data}
 
-\item{family}{string specifying whether the data has binary or continuous outcomes.
-Use "binary" for binary outcomes and "continuous" for continuous outcomes.
-(default: "binary").}
+\item{training_genotype}{dataframe containing the training genotype data}
+
+\item{validation_genotype}{dataframe containing the validation genotype data}
+
+\item{family}{string specifying the type of model to fit a \link[stats]{glm}.
+Use "binomial" for binary outcomes and "gaussian" for continuous outcomes.}
 
 \item{biglasso}{logical flag indicating whether to use big data optimization.
 If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses
@@ -65,18 +56,27 @@ lam.max and lam.min. This value is used to generate the lambda sequence in \link
 
 \item{tolerance}{tolerance level for noise in mirror statistics.}
 
-\item{threshold}{threshold value for determining significance in mirror
-statistics.}
+\item{threshold}{threshold value ``v” for determining the significance of difference between training improvement and validation improvement, see equation (3) of ABPRS paper.}
 
 \item{err}{error threshold for model performance improvement.}
 
-\item{delta}{additional tuning parameter for the FDR control.}
+\item{delta}{if ``NULL” then using GLM to fit the regression model on the validation dataset (default).
+If a small value is specified, the debiased lasso method is applied, where the Hessian matrix is adjusted
+by adding an identity matrix weighted by delta to ensure invertibility.}
 }
 \value{
-Adaptively-boosted polygenic risk scores of the target sample.
+A dataframe with three columns. The first column named "Weight" stores
+the weights for pre-trained PRS scores and selected \eqn{\theta_{SNPs}}. The
+second and third columns stores the theta1 (theta encoding for heterozygous
+alleles Aa) and theta2 (theta encoding for homozygous alternative alleles aa)
+of the selected \eqn{\theta_{SNPs}}, which are useful for encoding the genotype
+when producing adaptively-boosted polygenic risk scores (AB-PRSs).
 }
 \description{
-This function adaptively-boosts pre-trained polygenic risk scores of a target
-sample and returns the newly adaptively boosted polygenic risk scores of that
-sample.
+This function runs the ABPRS method and returns the weights of
+the pre-trained prs and selected \eqn{\theta_{SNPs}} used for ABPRS calculation.
+For the selected \eqn{\theta_{SNPs}}, it also returns their corresponding
+theta1 (theta encoding for heterozygous alleles Aa) and theta2 (theta encoding
+for homozygous alternative alleles aa) values, which are important for encoding
+the genotype matrices when producing adaptively-boosted polygenic risk scores (AB-PRSs).
 }
