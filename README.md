@@ -1,38 +1,40 @@
 # ABPRS
-Hi :D Here's a preliminary R package for ABPRS. Please let me know if you have any questions!
 
-# Instructions on How to Load R Package:
-Since it is currently a private package, you will need to download it first before installing. 
+Insert Short Description
 
-METHOD 1:
+## Installation and Loading
+
 1. To install in R library, use:
      ```ruby
-     devtools::install("filepath")
+     devtools::install_github("oreomilk2005/ABPRS")
      ```
 2. To load, use:
      ```ruby
      library(ABPRS)
      ```
 
-METHOD 2:
+## Current Functions:
+- ABPRS
+- learning_theta_snps
+- encoding_theta_snps
+- adaptive_variable_selection_binary
+- adaptive_variable_selection_continuous
+- data_simulation
+- model_evaluation
 
-If you do not wish to install in the R library and solely wish to load the package, use:
 
+## Basic Function Usage 
 ```ruby
-devtools::load_all("filepath")
+     abprs <- ABPRS(target_prs = target_prs, target_genotype=target_genotype, 
+                    training_genotype=training_genotype, validation_genotype=validation_genotype,
+                    training_prs=training_prs, validation_prs=validation_prs, 
+                    training_phenotype=training_phenotype, validation_phenotype=validation_phenotype,
+                    family="binary", biglasso = FALSE, 
+                    lam.max = 0.002, lam.min = 6e-05, nlambda = 50,
+                    alpha = 0.1, tolerance = 0.025, threshold = 0.01, err = 1e-05,
+                    delta = NULL)
 ```
 
-# Current Functions:
-- learning_betas
-- convert_theta
-- FDR_selection_GLM
-- FDR_selection_LM
-- Lasso_selection
-- binary_simulation
-- split_data
-- Evaluate
+## References
 
-# Tasks:
-- Come up with better names
-- Refine descriptions
-- Refine functions (eg. FDR_GLM)
+Insert references
