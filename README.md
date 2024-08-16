@@ -33,24 +33,20 @@ For Later:
 
 ## Current Functions:
 - ABPRS
+- apply_weights
 - learning_theta_snps
 - encoding_theta_snps
-- adaptive_variable_selection_binary
-- adaptive_variable_selection_continuous
+- adaptive_variable_selection
 - data_simulation
 - model_evaluation
 
 
 ## Basic Function Usage 
 ```ruby
-     abprs <- ABPRS(target_prs = target_prs, target_genotype=target_genotype, 
-                    training_genotype=training_genotype, validation_genotype=validation_genotype,
-                    training_prs=training_prs, validation_prs=validation_prs, 
-                    training_phenotype=training_phenotype, validation_phenotype=validation_phenotype,
-                    family="binary", biglasso = FALSE, 
-                    lam.max = 0.002, lam.min = 6e-05, nlambda = 50,
-                    alpha = 0.1, tolerance = 0.025, threshold = 0.01, err = 1e-05,
-                    delta = NULL)
+weights <- ABPRS(pre_trained_prs = prs_train, validation_prs=prs_val, 
+                 training_genotype=geno_train, validation_genotype=geno_val,
+                 training_phenotype=pheno_train, validation_phenotype=pheno_val,
+                 family="binomial")
 ```
 
 ## References
