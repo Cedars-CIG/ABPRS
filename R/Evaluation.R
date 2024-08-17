@@ -189,7 +189,7 @@ tableHTML(PerformanceScores),
 
 "<h2>Performance Score Comparisons</h2>",
 "<iframe src='BarPlot.html' width='800' height='500'></iframe>",
-"<div>This barplot compares the", ylab ,"performance score between different 
+"<div>This barplot compares the AUC performance score between different 
 sets of PRSs derived from different models. The models are ordered by increasing 
 performance score. </div>",
 "<pre><code>", barplot_code, "</code></pre>",
@@ -226,7 +226,7 @@ html_continuous <- function(phenotype, all_prs, all_names, style){
   # Plot1: Performance Score Plot
   all_mse <- sapply(all_prs, function(prs) MSE_Score(prs, phenotype))
   all_r2 <- sapply(all_prs, function(prs) RSquared_Score(prs, phenotype))
-  PerformanceScores <- data.frame(Model=all_names, MSE=all_MSE, `R-Squared`=all_r2)
+  PerformanceScores <- data.frame(Model=all_names, MSE=all_mse, `R-Squared`=all_r2)
   ylab = "MSE"
   BarPlot <- Plot_Score(PerformanceScores[,c(1:2)], ylab)
   barplot_code <- "
@@ -263,12 +263,6 @@ style,
 var csv1 = \"", scores_csv, "\"
 var filename1 = \"PerformanceScores.csv\"
 
-# var csv2 = \"", prs_csv, "\"
-# var filename2 = \"StandardizedPRS.csv\"
-# 
-# var csv3 = \"", prev_csv, "\"
-# var filename3 = \"PrevalenceData.csv\"
-
 function download_csv_file(csv, filename) {
     var hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
@@ -292,17 +286,10 @@ tableHTML(PerformanceScores),
 
 "<h2>Performance Score Comparisons</h2>",
 "<iframe src='BarPlot.html' width='800' height='500'></iframe>",
+"<div>This barplot compares the AUC performance score between different 
+sets of PRSs derived from different models. The models are ordered by increasing 
+performance score. </div>",
 "<pre><code>", barplot_code, "</code></pre>",
-
-# "<h2>Polygenic Risk Score Distributions</h2>
-#     <iframe src='DensityPlot.html' width='800' height='500'></iframe>",
-# "<button onclick=\"download_csv_file(csv2, filename2)\">Download StandardizedPRS.csv</button>",
-# "<pre><code>", densityplot_code, "</code></pre>",
-# 
-# "<h2>Phenotype vs PRS Percentile</h2>
-#  <iframe src='PrevalencePlot.html' width='800' height='500'></iframe>",
-# "<button onclick=\"download_csv_file(csv3, filename3)\">Download PrevalenceData.csv</button>",
-# "<pre><code>", prevalence_code, "</code></pre>",
 
 "</body>
 </html>"), 

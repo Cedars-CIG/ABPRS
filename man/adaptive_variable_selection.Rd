@@ -28,9 +28,9 @@ adaptive_variable_selection(
 
 \item{validation_prs}{a dataframe containing the pre-trained validation polygenic risk scores}
 
-\item{training_phenotype}{a dataframe containing the training phenotype data}
+\item{training_phenotype}{a vector containing the training phenotype data}
 
-\item{validation_phenotype}{a dataframe containing the validation phenotype data}
+\item{validation_phenotype}{a vector containing the validation phenotype data}
 
 \item{training_theta_encoding}{a dataframe containing the training thetas}
 

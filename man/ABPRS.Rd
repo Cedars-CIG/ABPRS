@@ -28,9 +28,9 @@ ABPRS(
 
 \item{validation_prs}{dataframe containing the pre-trained validation polygenic risk scores}
 
-\item{training_phenotype}{dataframe containing the training phenotype data}
+\item{training_phenotype}{vector containing the training phenotype data}
 
-\item{validation_phenotype}{dataframe containing the validation phenotype data}
+\item{validation_phenotype}{vector containing the validation phenotype data}
 
 \item{training_genotype}{dataframe containing the training genotype data}
 
