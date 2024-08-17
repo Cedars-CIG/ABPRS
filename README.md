@@ -35,8 +35,8 @@ For Later:
 - ABPRS: overall function to get weights
 - apply_weights: helper function to apply weights
 - learning_theta_snps: learn theta1 and theta2 values
-- encoding_theta_snps: encode \eqn{theta_{SNPs}} on genotype
-- adaptive_variable_selection: get supports (important \eqn{theta_{SNPs}})
+- encoding_theta_snps: encode $\theta_{SNPs}$ on genotype
+- adaptive_variable_selection: get supports (important $\theta_{SNPs}$)
 - data_simulation: generate simulated datasets
 - model_evaluation: evaluate different prs models
 
