@@ -12,6 +12,7 @@ ABPRS(
   training_genotype,
   validation_genotype,
   family,
+  covariate = NULL,
   biglasso = FALSE,
   lam.max = 0.002,
   lam.min = 6e-05,
@@ -38,6 +39,8 @@ ABPRS(
 
 \item{family}{string specifying the type of model to fit a \link[stats]{glm}.
 Use "binomial" for binary outcomes and "gaussian" for continuous outcomes.}
+
+\item{covariate}{dataframe containing the covariates (default: NULL)}
 
 \item{biglasso}{logical flag indicating whether to use big data optimization.
 If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses

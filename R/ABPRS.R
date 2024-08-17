@@ -15,6 +15,7 @@
 #' @param validation_genotype dataframe containing the validation genotype data
 #' @param family string specifying the type of model to fit a \link[stats]{glm}.
 #' Use "binomial" for binary outcomes and "gaussian" for continuous outcomes. 
+#' @param covariate dataframe containing the covariates (default: NULL)
 #' @param biglasso logical flag indicating whether to use big data optimization. 
 #' If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses 
 #' the standard \link[glmnet]{glmnet} (default: FALSE)
@@ -43,7 +44,7 @@
 ABPRS <- function(pre_trained_prs, validation_prs, 
                    training_phenotype, validation_phenotype, 
                    training_genotype, validation_genotype,
-                   family, biglasso=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
+                   family, covariate=NULL, biglasso=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
                    alpha=0.1, tolerance=0.025, threshold=0.01,err=1e-5, delta=NULL){
   
   if(family != "binomial" && family != "continuous"){
@@ -52,7 +53,7 @@ ABPRS <- function(pre_trained_prs, validation_prs,
   
   # Learning beta coefficients using training data
   thetas_mat <- learning_theta_snps(phenotype=training_phenotype, genotype=training_genotype, 
-                                    pre_trained_prs=pre_trained_prs, cov=NULL, family=family)
+                                    pre_trained_prs=pre_trained_prs, covariate=covariate, family=family)
   
   # Convert thetas
   theta_train <-encoding_theta_snps(genotype=training_genotype, thetas=thetas_mat)
