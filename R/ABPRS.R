@@ -9,8 +9,8 @@
 #' 
 #' @param pre_trained_prs dataframe containing the pre-trained training polygenic risk scores
 #' @param validation_prs dataframe containing the pre-trained validation polygenic risk scores
-#' @param training_phenotype dataframe containing the training phenotype data
-#' @param validation_phenotype dataframe containing the validation phenotype data
+#' @param training_phenotype vector containing the training phenotype data
+#' @param validation_phenotype vector containing the validation phenotype data
 #' @param training_genotype dataframe containing the training genotype data
 #' @param validation_genotype dataframe containing the validation genotype data
 #' @param family string specifying the type of model to fit a \link[stats]{glm}.

@@ -74,8 +74,8 @@ REF_DS_inf <- function(x, y, family, lasso_est, delta) {
 #'
 #' @param pre_trained_prs a dataframe containing the pre-trained training polygenic risk scores
 #' @param validation_prs a dataframe containing the pre-trained validation polygenic risk scores
-#' @param training_phenotype a dataframe containing the training phenotype data
-#' @param validation_phenotype a dataframe containing the validation phenotype data
+#' @param training_phenotype a vector containing the training phenotype data
+#' @param validation_phenotype a vector containing the validation phenotype data
 #' @param training_theta_encoding a dataframe containing the training thetas
 #' @param validation_theta_encoding a dataframe containing the validation thetas
 #' @param family a string specifying the type of model to fit a \link[stats]{glm}.
