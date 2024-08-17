@@ -26,7 +26,9 @@
 #' lam.max and lam.min. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
 #' @param alpha desired FDR control level.
 #' @param tolerance tolerance level for noise in mirror statistics.
-#' @param threshold threshold value ``v” for determining the significance of difference between training improvement and validation improvement, see equation (3) of ABPRS paper.
+#' @param threshold threshold value ``v” for determining the significance of 
+#' difference between training improvement and validation improvement, 
+#' see equation (3) of ABPRS paper.
 #' @param err error threshold for model performance improvement.
 #' @param delta if ``NULL” then using GLM to fit the regression model on the validation dataset (default). 
 #' If a small value is specified, the debiased lasso method is applied, where the Hessian matrix is adjusted 
@@ -50,7 +52,7 @@ ABPRS <- function(pre_trained_prs, validation_prs,
   
   # Learning beta coefficients using training data
   thetas_mat <- learning_theta_snps(phenotype=training_phenotype, genotype=training_genotype, 
-                                    prs=pre_trained_prs, cov=NULL, family=family)
+                                    pre_trained_prs=pre_trained_prs, cov=NULL, family=family)
   
   # Convert thetas
   theta_train <-encoding_theta_snps(genotype=training_genotype, thetas=thetas_mat)

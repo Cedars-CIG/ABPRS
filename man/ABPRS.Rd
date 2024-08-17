@@ -56,7 +56,9 @@ lam.max and lam.min. This value is used to generate the lambda sequence in \link
 
 \item{tolerance}{tolerance level for noise in mirror statistics.}
 
-\item{threshold}{threshold value ``v” for determining the significance of difference between training improvement and validation improvement, see equation (3) of ABPRS paper.}
+\item{threshold}{threshold value ``v” for determining the significance of
+difference between training improvement and validation improvement,
+see equation (3) of ABPRS paper.}
 
 \item{err}{error threshold for model performance improvement.}
 

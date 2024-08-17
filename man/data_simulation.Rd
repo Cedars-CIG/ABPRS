@@ -4,19 +4,21 @@
 \alias{data_simulation}
 \title{Generate Simulation Data}
 \usage{
-data_simulation(m, effect_snps_vec, n, maf, effect_size, beta0, binary = TRUE)
+data_simulation(m, effect_snps_vec, n, maf, effect_size, beta0, binary)
 }
 \arguments{
 \item{m}{total number of snps}
 
 \item{n}{total number of samples}
 
-\item{effect_size}{effect size of the effective snps}
+\item{effect_size}{effect size of the effective snps, which follows}
 
-\item{beta0}{beta0 value, used to ensure a certain percentage of case phenotype}
+\item{beta0}{beta0 value in equation 1 of the details section; it is used to
+ensure a certain percentage of case phenotype for binary outcomes, and to serve
+as a baseline measurement for continuous outcomes.}
 
 \item{binary}{a boolean flag indicating whether the data has binary outcomes (TRUE)
-or continuous outcomes (FALSE). (Default: TRUE)}
+or continuous outcomes (FALSE).}
 
 \item{effect_snp_vec}{vector of length 4 containing the number of effective snps
 with additive, dominant, recessive, and codominant encoding respectively}
@@ -26,6 +28,5 @@ A dataframe containing the simulated phenotype in the first column and the
 simulated genotype encoding in the rest of the columns.
 }
 \description{
-This function generates simulated genotype and phenotype information for
-\emph{m} amount of snps and \emph{n} amount of individuals.
+This function generates simulated phenotype and genotype information.
 }

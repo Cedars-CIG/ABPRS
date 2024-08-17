@@ -91,11 +91,14 @@ REF_DS_inf <- function(x, y, family, lasso_est, delta) {
 #' lam.max and lam.min. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
 #' @param alpha desired FDR control level.
 #' @param tolerance tolerance level for noise in mirror statistics.
-#' @param threshold threshold value for determining significance in mirror 
-#' statistics.
+#' @param threshold threshold value ``v” for determining the significance of 
+#' difference between training improvement and validation improvement, 
+#' see equation (3) of ABPRS paper.
 #' @param err error threshold for model performance improvement.
-#' @param delta additional tuning parameter for the FDR control.
-#' @return A vector of selected \eqn{\theta_{SNPs}}. 
+#' @param delta if ``NULL” then using GLM to fit the regression model on the validation dataset (default). 
+#' If a small value is specified, the debiased lasso method is applied, where the Hessian matrix is adjusted 
+#' by adding an identity matrix weighted by delta to ensure invertibility.
+#' @return A vector of selected \eqn{\theta_{SNPs}} names. 
 #' @export
 adaptive_variable_selection<-function(pre_trained_prs, validation_prs, 
                                       training_phenotype, validation_phenotype, 

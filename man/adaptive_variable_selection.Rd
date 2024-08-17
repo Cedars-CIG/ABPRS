@@ -56,15 +56,18 @@ lam.max and lam.min. This value is used to generate the lambda sequence in \link
 
 \item{tolerance}{tolerance level for noise in mirror statistics.}
 
-\item{threshold}{threshold value for determining significance in mirror
-statistics.}
+\item{threshold}{threshold value ``v” for determining the significance of
+difference between training improvement and validation improvement,
+see equation (3) of ABPRS paper.}
 
 \item{err}{error threshold for model performance improvement.}
 
-\item{delta}{additional tuning parameter for the FDR control.}
+\item{delta}{if ``NULL” then using GLM to fit the regression model on the validation dataset (default).
+If a small value is specified, the debiased lasso method is applied, where the Hessian matrix is adjusted
+by adding an identity matrix weighted by delta to ensure invertibility.}
 }
 \value{
-A vector of selected \eqn{\theta_{SNPs}}.
+A vector of selected \eqn{\theta_{SNPs}} names.
 }
 \description{
 This function identifies important \eqn{\theta_{SNPs}} through adaptive variable

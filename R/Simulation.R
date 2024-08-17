@@ -7,22 +7,23 @@ library(data.table)
 
 #' Generate Simulation Data
 #' 
-#' This function generates simulated genotype and phenotype information for 
-#' \emph{m} amount of snps and \emph{n} amount of individuals. 
+#' This function generates simulated phenotype and genotype information.
 #' 
 #' @param m total number of snps
 #' @param effect_snp_vec vector of length 4 containing the number of effective snps
 #' with additive, dominant, recessive, and codominant encoding respectively
 #' @param n total number of samples
-#' @param effect_size effect size of the effective snps
-#' @param beta0 beta0 value, used to ensure a certain percentage of case phenotype
+#' @param effect_size effect size of the effective snps, which follows 
+#' @param beta0 beta0 value in equation 1 of the details section; it is used to 
+#' ensure a certain percentage of case phenotype for binary outcomes, and to serve
+#' as a baseline measurement for continuous outcomes. 
 #' @param binary a boolean flag indicating whether the data has binary outcomes (TRUE)
-#' or continuous outcomes (FALSE). (Default: TRUE)
+#' or continuous outcomes (FALSE). 
 #' @return A dataframe containing the simulated phenotype in the first column and the
 #' simulated genotype encoding in the rest of the columns. 
 #' 
 #' @export
-data_simulation <- function(m, effect_snps_vec, n, maf, effect_size, beta0, binary=TRUE){
+data_simulation <- function(m, effect_snps_vec, n, maf, effect_size, beta0, binary){
   
   #Total number of snps
   effect_snps <- sum(effect_snps_vec)
@@ -104,24 +105,4 @@ data_simulation <- function(m, effect_snps_vec, n, maf, effect_size, beta0, bina
   dat <- as.data.frame(dat)
   
   return(dat)
-}
-
-#' Split data
-#' 
-#' @param data dataframe of original dataset 
-#' @param probability vector with the probability of each partition you wish to produce 
-#' @return  list of splited data
-split_data <- function(data, probability){
-  
-  n<-nrow(data)
-  partitions <- length(probability)
-  
-  sample_id<-sample(1:partitions,size=n,replace=T,prob=probability)
-  
-  split <- vector("list", partitions)
-  for(i in 1:partitions){
-    split[[i]] <- data[which(sample_id==i), ]
-  }
-  
-  return(split)
 }
