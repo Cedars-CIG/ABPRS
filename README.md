@@ -38,7 +38,7 @@ For Later:
 - encoding_theta_snps: encode $\theta_{SNPs}$ on genotype
 - adaptive_variable_selection: get supports (important $\theta_{SNPs}$)
 - data_simulation: generate simulated datasets
-- model_evaluation: evaluate different prs models
+- model_evaluation: evaluate different prs models [NOT FINISHED]
 
 
 ## Basic Function Usage 
