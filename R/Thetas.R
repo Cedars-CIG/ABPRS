@@ -7,10 +7,10 @@ library(data.table)
 
 #' Compute \eqn{\theta_{SNPs}} for ABPRS
 #'
-#' This function computes \eqn{\theta_{SNPs}} and their corresponding p-values for each SNP.
-#' Specifically, the function fits a regression model to the phenotype outcome using the
-#' genotype, PRS, and covariates. The function uses a binomial model for binary
-#' outcomes and a Gaussian model for continuous outcomes.
+#' This function computes \eqn{\theta_{SNPs}} and their corresponding p-values asssociated
+#' with the outcome. Specifically, the function fits a regression model to the 
+#' phenotype outcome using the genotype, PRS, and covariates. The function uses 
+#' a binomial model for binary outcomes and a Gaussian model for continuous outcomes.
 #' 
 #' @param phenotype a dataframe containing the phenotype
 #' @param pre_trained_prs a dataframe containing the pre-trained polygenic risk scores 

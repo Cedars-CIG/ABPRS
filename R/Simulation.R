@@ -10,17 +10,25 @@ library(data.table)
 #' This function generates simulated phenotype and genotype information.
 #' 
 #' @param m total number of snps
-#' @param effect_snp_vec vector of length 4 containing the number of effective snps
+#' @param effect_snps_vec vector of length 4 containing the number of effective snps
 #' with additive, dominant, recessive, and codominant encoding respectively
 #' @param n total number of samples
-#' @param effect_size effect size of the effective snps, which follows 
-#' @param beta0 beta0 value in equation 1 of the details section; it is used to 
-#' ensure a certain percentage of case phenotype for binary outcomes, and to serve
-#' as a baseline measurement for continuous outcomes. 
+#' @param effect_size effect size of the effective snps, which acts differently
+#' depending on binary or continuous outcomes. See \eqn{\beta} in the equations sections. 
+#' @param beta0 a value to ensure a certain percentage of case phenotype for 
+#' binary outcomes and to serve as a baseline measurement for continuous outcomes. 
+#' See \eqn{\beta_{0}} in the equations section. 
 #' @param binary a boolean flag indicating whether the data has binary outcomes (TRUE)
 #' or continuous outcomes (FALSE). 
 #' @return A dataframe containing the simulated phenotype in the first column and the
 #' simulated genotype encoding in the rest of the columns. 
+#' @section Equations:
+#' 
+#' For binary outcomes, the phenotypes are simulated using a logistic model, as shown in the equation below: \cr
+#' \deqn{\log \left(\frac{P(Y=1| \mathbf{X})}{1-P(Y=1| \mathbf{X})} \right)=\beta_0+\left(\mathbf{X}_{ADD}, \mathbf{X}_{Non-ADD} \right)\bm{\beta}}
+#' 
+#' For continuous outcomes, the phenotypes are simulated using the equation below: \cr
+#' \deqn{{Y}=\beta_0+\left(\mathbf{X}_{ADD}, \mathbf{X}_{Non-ADD} \right)\bm{\beta}}
 #' 
 #' @export
 data_simulation <- function(m, effect_snps_vec, n, maf, effect_size, beta0, binary){

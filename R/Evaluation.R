@@ -13,7 +13,7 @@ library(htmlwidgets)
 #' Evaluation Function 
 #' 
 #' This function evaluates the performance of at least one PRS model on the same 
-#' outcome by utilizing various methods, depending on whether the outcome is binary
+#' outcome by utilizing various evaluation methods, depending on whether the outcome is binary
 #' or continuous. 
 #' 
 #' @param phenotype matrix containing the phenotype information

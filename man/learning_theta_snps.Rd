@@ -31,8 +31,8 @@ for heterozygous alleles Aa), theta2 (theta encoding for homozygous alternative
 alleles aa), and the p-value associated with \eqn{\theta_{SNPs}} and the outcome.
 }
 \description{
-This function computes \eqn{\theta_{SNPs}} and their corresponding p-values for each SNP.
-Specifically, the function fits a regression model to the phenotype outcome using the
-genotype, PRS, and covariates. The function uses a binomial model for binary
-outcomes and a Gaussian model for continuous outcomes.
+This function computes \eqn{\theta_{SNPs}} and their corresponding p-values asssociated
+with the outcome. Specifically, the function fits a regression model to the
+phenotype outcome using the genotype, PRS, and covariates. The function uses
+a binomial model for binary outcomes and a Gaussian model for continuous outcomes.
 }
