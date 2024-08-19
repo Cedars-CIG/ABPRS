@@ -32,13 +32,13 @@ For Later:
      ```
 
 ## Current Functions:
-- ABPRS
-- apply_weights
-- learning_theta_snps
-- encoding_theta_snps
-- adaptive_variable_selection
-- data_simulation
-- model_evaluation
+- ABPRS: overall function to get weights
+- apply_weights: helper function to apply weights
+- learning_theta_snps: learn theta1 and theta2 values
+- encoding_theta_snps: encode $\theta_{SNPs}$ on genotype
+- adaptive_variable_selection: get supports (important $\theta_{SNPs}$)
+- data_simulation: generate simulated datasets
+- model_evaluation: evaluate different prs models [NOT FINISHED]
 
 
 ## Basic Function Usage 
@@ -48,6 +48,8 @@ weights <- ABPRS(pre_trained_prs = prs_train, validation_prs=prs_val,
                  training_phenotype=pheno_train, validation_phenotype=pheno_val,
                  family="binomial")
 ```
+
+Please check ABPRS-Tutorial.html for a detailed tutorial. 
 
 ## References
 
