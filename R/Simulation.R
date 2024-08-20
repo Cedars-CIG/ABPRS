@@ -13,6 +13,7 @@ library(data.table)
 #' @param effect_snps_vec vector of length 4 containing the number of effective snps
 #' with additive, dominant, recessive, and codominant encoding respectively
 #' @param n total number of samples
+#' @param maf minor allele frequency of effective SNPs
 #' @param effect_size effect size of the effective snps, which acts differently
 #' depending on binary or continuous outcomes. See \eqn{\beta} in the equations sections. 
 #' @param beta0 a value to ensure a certain percentage of case phenotype for 

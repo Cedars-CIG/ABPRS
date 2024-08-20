@@ -45,6 +45,6 @@ for each set of PRSs
 }
 \description{
 This function evaluates the performance of at least one PRS model on the same
-outcome by utilizing various methods, depending on whether the outcome is binary
+outcome by utilizing various evaluation methods, depending on whether the outcome is binary
 or continuous.
 }
