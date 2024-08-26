@@ -24,7 +24,7 @@ For Later:
 
 1. To install in R library, use:
      ```ruby
-     devtools::install_github("oreomilk2005/ABPRS")
+     devtools::install_github("wuoli/ABPRS")
      ```
 2. To load, use:
      ```ruby
