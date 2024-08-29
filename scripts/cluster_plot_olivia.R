@@ -53,9 +53,9 @@ ggplot(df_summary_sep_iqr, aes(x = Genotype, y = Median, group = cluster, color 
   labs(x = "Genotype", y = "Value", color = "Cluster") +
   facet_grid(slope_group ~ cluster , scales = "free_y", labeller = labeller(slope_group = c("Positive Slope" = "Positive Slope", "Negative Slope" = "Negative Slope"))) +
   theme_minimal() +
-  theme(strip.text.y = element_text(size = 12), 
-        strip.text.x = element_text(size = 12), 
-        panel.grid.major = element_blank())
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_line(colour="grey"), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+#theme(strip.text.y = element_text(size = 12), strip.text.x = element_text(size = 12))
 
 # If you wish to strip the background, use: 
 # theme(panel.border = element_blank(), 
