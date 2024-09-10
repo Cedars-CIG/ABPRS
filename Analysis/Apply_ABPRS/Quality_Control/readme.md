@@ -6,4 +6,4 @@
     5. Drop related participants
     6. Remove participants that DO NOT have genotype data
 - For SNPs
-    1. (add `PLINK` code here)
+    1. No quality control
