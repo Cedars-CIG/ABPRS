@@ -46,7 +46,7 @@ library(htmlwidgets)
 #' 
 #' @export
 #' 
-model_evaluation <- function(phenotype, ..., binary=TRUE){
+model_evaluation <- function(phenotype, ..., binary, bin=10){
   
   #Retrieve PRS Scores
   all_prs <- list(...)
@@ -60,7 +60,7 @@ model_evaluation <- function(phenotype, ..., binary=TRUE){
   call <- match.call()
   call_list <- as.list(call)
   all_names <- names(call_list)[-c(1,2)] 
-  all_names <- all_names[-length(all_names)]
+  all_names <- all_names[-c(length(all_names), length(all_names)-1)]
   if(any(nchar(all_names)==0)){
     all_names <- paste0("PRS", 1:length(all_prs))
   }
@@ -80,15 +80,15 @@ model_evaluation <- function(phenotype, ..., binary=TRUE){
 </style>"
   
   if(binary){
-    html_binary(phenotype, all_prs, all_names, style)
+    html_binary(phenotype, all_prs, all_names, style, bin=bin)
   }else{
-    html_continuous(phenotype, all_prs, all_names, style)
+    html_continuous(phenotype, all_prs, all_names, style, bin=bin)
   }
   
   return("Done")
 }
 
-html_binary<- function(phenotype, all_prs, all_names, style){
+html_binary<- function(phenotype, all_prs, all_names, style, bin){
   
   n_model <- length(all_names)
   
@@ -129,7 +129,7 @@ html_binary<- function(phenotype, all_prs, all_names, style){
   prs_csv <- convert_df_to_string(PRSTable)
   
   # PLOT 3: Percentage of Cases vs. PRS Percentile
-  prev_data = Prevalence_Data(phenotype, all_prs, all_names, 15)
+  prev_data = Prevalence_Data(phenotype, all_prs, all_names, bin)
   prev_csv <- convert_df_to_string(prev_data)
   PrevalencePlot = Prevalence_Plot(prev_data)
   prevalence_code <- "

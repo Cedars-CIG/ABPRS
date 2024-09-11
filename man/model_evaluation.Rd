@@ -4,7 +4,7 @@
 \alias{model_evaluation}
 \title{Evaluation Function}
 \usage{
-model_evaluation(phenotype, ..., binary = TRUE)
+model_evaluation(phenotype, ..., binary, bin = 10)
 }
 \arguments{
 \item{phenotype}{matrix containing the phenotype information}

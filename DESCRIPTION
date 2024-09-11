@@ -22,3 +22,7 @@ Imports:
     plotly,
     tableHTML,
     htmlwidgets
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
