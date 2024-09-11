@@ -1,0 +1,12 @@
+﻿phenotype,min,max,unit
+bmi,12.1212,74.6837,
+cholesterol,10.818,278.28,mg/dl
+hdl,3.942,79.218,mg/dl
+ldl,4.788,176.346,mg/dl
+,,,
+,,,
+phenotype,min,max,unit
+bmi,12.1212,74.6837,
+cholesterol,0.601,15.46,mmo/l
+hdl,0.219,4.401,mmo/l
+ldl,0.266,9.797,mmo/l
