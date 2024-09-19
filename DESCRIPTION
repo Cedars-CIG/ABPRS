@@ -1,12 +1,17 @@
 Package: ABPRS
 Title: Adaptively Boosting Pre-trained Polygenic Risk Scores
-Version: 0.0.0
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: The package contains functions to produce ABPRS. 
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Version: 1.0.0
+Authors@R: c(
+    person("Jie", "Hu", , "fJie.Hu@pennmedicine.upenn.edu", role = c("aut", "cre"))
+    person("Raelynn", "Chen", , "raelynn.chen@cshs.org", role = "aut")
+    person("Max", "Salvatore", , "Maxwell.Salvatore@pennmedicine.upenn.edu", role = "aut")
+    person("Olivia", "Wu", , "oliviawu27@g.ucla.edu", role = "cre")
+    person("Yong", "Chen", , "first.last@example.com", role = "aut")
+    person("Ruowang", "Li", , "first.last@example.com", role = "aut")
+)
+Description: The package contains functions to generate AB-PRSs. 
+License: `use_mit_license()`
+Language: en-US
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
