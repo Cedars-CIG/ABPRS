@@ -136,10 +136,9 @@ html_binary<- function(phenotype, all_prs, all_names, style, bin){
   plot <- ggplot(PrevalenceData, aes(x = Percentile, y = Prevalence, color=Model)) +
     geom_point(size = 3) +
     labs(x = \"Risk Score Percentile\", y = \"Case Prevalence\",
-         title = \"Case Prevalence vs. Risk Score Percentile\") +
+         title = \"Prevalence vs. Risk Score Percentile\") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          panel.background = element_blank(), axis.line = element_line(colour = \"black\")) + 
-    scale_color_manual(values = setNames(c(\"#ef8a62\", \"#67a9cf\"), c(name1, name2)))"
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
   saveWidget(PrevalencePlot, "PrevalencePlot.html", selfcontained = TRUE)
   
   # PLOT 4: Odds Ratio Plot
@@ -219,7 +218,7 @@ higher risk score percentiles and a lower prevalence in the lower percentiles.
 file = "Evaluation.html")
 }
 
-html_continuous <- function(phenotype, all_prs, all_names, style){
+html_continuous <- function(phenotype, all_prs, all_names, style, bin){
   
   n_model <- length(all_names)
   
@@ -236,15 +235,25 @@ html_continuous <- function(phenotype, all_prs, all_names, style){
     scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
     labs(x=\"Model\", y=ylab, fill=\"Model\") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          panel.background = element_blank(), axis.line = element_line(colour = \"black\")) +
-    scale_fill_manual(values = setNames(c(\"#ef8a62\", \"#67a9cf\"), c(name1, name2)))"
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
   saveWidget(BarPlot, "BarPlot.html", selfcontained = TRUE)
-  PerformanceScores[,c(2,3)]<- round(PerformanceScores[,c(2,3)], 3)
+  PerformanceScores[,-1]<- round(PerformanceScores[,-1], 3)
   scores_csv <- convert_df_to_string(PerformanceScores)
   
   # Plot 2: Mean of Phenotype vs. Risk Score Percentile
-  MeanPheno <- data.frame(TBA=c("TBA", "TBA"))
-  
+  mean_data = Mean_Data(phenotype, all_prs, all_names, bin)
+  mean_csv <- convert_df_to_string(mean_data)
+  MeanPlot = Mean_Plot(mean_data)
+  mean_code <- "
+  plot <- ggplot(MeanData, aes(x = Percentile, y = Prevalence, color=Model)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin=Mean-SD, ymax=Mean+SD), width=0, alpha=0.8) +
+    labs(x = \"Risk Score Percentile\", y = \"Mean of Phenotype\",
+         title = \"Mean of Phenotype vs. Risk Score Percentile\") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
+  saveWidget(MeanPlot, "MeanPlot.html", selfcontained = TRUE)
+
   # Plot 3: Mean Difference Plot
   MeanDiff <- data.frame(TBA=c("TBA", "TBA"))
   
@@ -262,6 +271,9 @@ style,
 
 var csv1 = \"", scores_csv, "\"
 var filename1 = \"PerformanceScores.csv\"
+
+var csv2 = \"", mean_csv, "\"
+var filename2 = \"MeanData.csv\"
 
 function download_csv_file(csv, filename) {
     var hiddenElement = document.createElement('a');
@@ -286,10 +298,20 @@ tableHTML(PerformanceScores),
 
 "<h2>Performance Score Comparisons</h2>",
 "<iframe src='BarPlot.html' width='800' height='500'></iframe>",
-"<div>This barplot compares the AUC performance score between different 
-sets of PRSs derived from different models. The models are ordered by increasing 
-performance score. </div>",
+"<div>This barplot compares the mean squared error (MSE) performance scores between different 
+sets of PRSs derived from different models. </div>",
 "<pre><code>", barplot_code, "</code></pre>",
+
+"<h2>Phenotype vs PRS Percentile</h2>
+ <iframe src='MeanPlot.html' width='800' height='500'></iframe>",
+"<div>This figure plots the mean of the continuous phenotype and +/- 
+1 standard deviation in each polygenic risk score quantiles, for different 
+PRS models. For each model,", bin, "quantiles are plotted in the graph. 
+A model that performs better should have a higher mean in the
+higher risk score percentiles and a lower mean in the lower percentiles.  
+</div>",
+"<button onclick=\"download_csv_file(csv2, filename2)\">Download MeanData.csv</button>",
+"<pre><code>", mean_code, "</code></pre>",
 
 "</body>
 </html>"), 
@@ -307,7 +329,9 @@ convert_df_to_string <- function(df) {
 
 Plot_Score <- function(PerformanceScores, ylab){
   colnames(PerformanceScores) = c("Model", "Score")
-  plot <- ggplot(data=PerformanceScores, aes(x=reorder(Model, +Score), y=Score, fill=Model)) +
+  PerformanceScores$Model <- factor(PerformanceScores$Model, levels = PerformanceScores$Model)
+  
+  plot <- ggplot(data=PerformanceScores, aes(x=Model, y=Score, fill=Model)) +
     geom_bar(stat="identity", width=0.5) +
     geom_text(aes(label=round(Score, 2)), size=3.5, vjust=-0.3) +
     scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
@@ -392,6 +416,48 @@ Prevalence_Plot <- function(PrevalenceData){
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           panel.background = element_blank(), axis.line = element_line(colour = "black")) #+ 
     #scale_color_manual(values = setNames(c("#ef8a62", "#67a9cf"), c(name1, name2)))
+  fig <- ggplotly(plot)
+  
+  return(fig)
+}
+
+Mean_Data <- function(pheno, all_prs, all_names, n){
+  
+  all_mean_data <- data.frame()
+  
+  # Loop over each PRS vector
+  for (i in seq_along(all_prs)) {
+    prs <- as.numeric(all_prs[[i]][,1])
+    name <- all_names[i]
+    
+    percentile <- ecdf(as.matrix(prs))(as.matrix(prs)) * 100
+    
+    data <- data.frame(Percentile = percentile, Phenotype = pheno)
+    
+    # Calculate Mean
+    mean <- data %>%
+      mutate(Percentile = ntile(Percentile, n)/n) %>%
+      group_by(Percentile) %>%
+      summarize(Mean = mean(Phenotype), SD=sd(Phenotype)) %>%
+      mutate(Model = name) 
+    
+    # Combine the current mean data with the accumulated data
+    all_mean_data <- rbind(all_mean_data, mean)
+  }
+  
+  return(all_mean_data)
+}
+
+Mean_Plot <- function(MeanData){
+  
+  plot <- ggplot(MeanData, aes(x = Percentile, y = Mean, color=Model)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin=Mean-SD, ymax=Mean+SD), width=0, alpha=0.8) +
+    labs(x = "Risk Score Percentile", y = "Mean of Phenotype",
+         title = "Mean of Phenotype vs. Risk Score Percentile")+
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) 
+  #scale_color_manual(values = setNames(c("#ef8a62", "#67a9cf"), c(name1, name2)))
   fig <- ggplotly(plot)
   
   return(fig)
