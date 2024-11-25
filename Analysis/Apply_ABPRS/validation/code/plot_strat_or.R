@@ -36,13 +36,25 @@ make_deciles <- function(x, p) {
             decile2 = ntile(pred2, 10),
         )
 }
-print_catt_p <- function(x) {
-    tmp_p <- x$p.value
-    if (tmp_p < 0.001) {
-        "P < 0.001"
+
+format_p_value <- function(p_value) {
+  if (!is.numeric(p_value) || length(p_value) != 1) {
+    stop("Input must be a single numeric value.")
+  }
+  
+  if (p_value < 0.001) {
+    if (p_value == 0) {
+        formatted <- "P < 2.2e-16"
     } else {
-        paste0("P = ", trimws(format(round(tmp_p, 3), nsmall = 3)))
+        formatted <- sprintf("%.1e", p_value) # Scientific notation with 1 decimal place
+        formatted <- paste0("P = ", formatted)
     }
+  } else {
+    formatted <- sprintf("%.3f", p_value) # Standard decimal with 3 decimal places
+    formatted <- paste0("P = ", formatted)
+  }
+  
+  return(formatted)
 }
 
 
@@ -86,11 +98,6 @@ quick_prep <- function(x) {
     ) |> mutate(model = factor(model, c("Pre-trained PRS", "AB-PRS")))
 }
 
-quick_prep(pmbb_dec) |>
-    pull(p_hi) |>
-    max() |>
-    (\(x) x* 1.05)()
-
 quick_plot2 <- function(dt_data, .pheno, cohort) {
 
     dt <- dt_data |> filter(pheno == .pheno)
@@ -105,8 +112,8 @@ quick_plot2 <- function(dt_data, .pheno, cohort) {
     # calculate p
     dt_cat1 <- CochranArmitageTest(table(dt_dec[, decile1], dt_dec[, y]), alternative = "o")
     dt_cat2 <- CochranArmitageTest(table(dt_dec[, decile2], dt_dec[, y]), alternative = "o")
-    dt_cat_p1 <- print_catt_p(dt_cat1)
-    dt_cat_p2 <- print_catt_p(dt_cat2)
+    dt_cat_p1 <- sapply(dt_cat1$p.value, format_p_value)
+    dt_cat_p2 <- sapply(dt_cat2$p.value, format_p_value)
     dt_cat_p <- data.table(
         model = c("Pre-trained PRS", "AB-PRS"),
         p     = c(dt_cat_p1, dt_cat_p2),
@@ -132,7 +139,7 @@ quick_plot2 <- function(dt_data, .pheno, cohort) {
         ) +
         geom_text(
             aes(x = 1, y = y, color = model, label = p),
-            data = dt_cat_p, show.legend = FALSE
+            data = dt_cat_p, show.legend = FALSE, hjust = 0
         ) +
         labs(
             title    = paste0("% ", .pheno, " cases by PRS decile in ", cohort),
