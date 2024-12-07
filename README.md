@@ -30,6 +30,9 @@ For Later:
      ```ruby
      library(ABPRS)
      ```
+     
+# Tutorial
+Please refer to https://cedars-cig.github.io/ABPRS/ for a getting-started tutorial. 
 
 ## Current Functions:
 - ABPRS: overall function to get weights
@@ -38,18 +41,19 @@ For Later:
 - encoding_theta_snps: encode $\theta_{SNPs}$ on genotype
 - adaptive_variable_selection: get supports (important $\theta_{SNPs}$)
 - data_simulation: generate simulated datasets
-- model_evaluation: evaluate different prs models [NOT FINISHED]
+- model_evaluation: evaluate various PRS models
 
 
 ## Basic Function Usage 
 ```ruby
-weights <- ABPRS(pre_trained_prs = prs_train, validation_prs=prs_val, 
-                 training_genotype=geno_train, validation_genotype=geno_val,
-                 training_phenotype=pheno_train, validation_phenotype=pheno_val,
-                 family="binomial")
+weights <- ABPRS(pre_trained_prs = training_prs, validation_prs=validation_prs, 
+                 training_genotype=training_genotype, validation_genotype=validation_genotype,
+                 training_phenotype=training_phenotype, validation_phenotype=validation_phenotype,
+                 family="binomial", covariate=NULL, biglasso=FALSE, 
+                 lam.max=NULL, lam.min=NULL, nlambda=100,
+                 alpha=0.1, tolerance=0.025, threshold=0.01,
+                 err=1e-5, delta=NULL)
 ```
-
-Please check ABPRS-Tutorial.html for a detailed tutorial. 
 
 ## References
 
