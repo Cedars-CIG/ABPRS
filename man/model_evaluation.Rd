@@ -4,7 +4,7 @@
 \alias{model_evaluation}
 \title{Evaluation Function}
 \usage{
-model_evaluation(phenotype, ..., binary, bin = 10)
+model_evaluation(phenotype, ..., binary, bin = 10, filename = "Evaluation")
 }
 \arguments{
 \item{phenotype}{matrix containing the phenotype information}
@@ -15,6 +15,8 @@ name of each set of polygenic risk score by providing a name for the parameter
 in this format: \code{model_evaluation(phenotype=phenotype, 'Pre-trained PRS'=df1, 'ABPRS'=df2)}.}
 
 \item{binary}{boolean that determines whether the data is binary or not}
+
+\item{bin}{number of bins used for the phenotype vs PRS percentile graph}
 
 \item{filename}{the name of the exported file}
 }
@@ -29,7 +31,6 @@ For Binary Outcomes:
 \item an interactable performance score comparison bar plot
 \item an interactable polygenic risk score distribution density plot
 \item an interactable percentage of cases vs polygenic risk score graph
-\item an interactable odds ratio plot
 \item the legend, ggplot code, and downloadable dataframe that produced the above plots
 }
 
@@ -39,7 +40,6 @@ For Continuous Outcomes:
 for each set of PRSs
 \item an interactable performance score comparison bar plot
 \item an interactable mean phenotype vs polygenic risk score percentile graph
-\item an interactable mean difference plot
 \item the legend, ggplot code, downloadable dataframe that produced the above plots
 }
 }

@@ -3,12 +3,12 @@ Title: Adaptively Boosting Pre-trained Polygenic Risk Scores
 Version: 1.0.0
 Authors@R: c(
     person("Jie", "Hu", email="Jie.Hu@pennmedicine.upenn.edu", role = "aut"),
-    person("Raelynn", "Chen", email="raelynn.chen@cshs.org", role = "aut"),
+    person("Raelynn", "Chen", email="Raelynn.Chen@cshs.org", role = "aut"),
     person("Max", "Salvatore", email="Maxwell.Salvatore@pennmedicine.upenn.edu", role = "aut"),
     person("Olivia", "Wu", email="oliviawu27@g.ucla.edu", role = "cre"),
-    person("Yong", "Chen", email="first.last@example.com", role = "aut"),
-    person("Ruowang", "Li", email="first.last@example.com", role = "aut"))
-Description: The package contains functions to generate AB-PRSs. 
+    person("Yong", "Chen", email="ychen123@upenn.edu", role = "aut"),
+    person("Ruowang", "Li", email="Ruowang.Li@cshs.org", role = "aut"))
+Description: The package contains core and helper functions for the AB-PRS algorithm. 
 License: use_mit_license()
 Language: en-US
 Encoding: UTF-8

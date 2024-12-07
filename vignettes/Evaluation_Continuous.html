@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Evaluation</title> <style>
+  body { font-family: Arial, sans-serif; }
+  div {max-width:800px; margin-inline: auto; margin-top:10px;}
+  pre { background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
+  iframe { display: block; margin: 0 auto; border:none;}
+  button { background-color: lightblue; border: none; color: black; 
+  padding: 10px 20px; text-align: center; text-decoration: none; 
+  display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; }
+  button:hover { background-color: #2c7bb6; }
+  table { width: 50%; border: 1px solid;}
+  th { background-color: lightblue; border: 1px solid; padding: 8px;}
+  td {border: 1px solid; padding: 8px;}
+</style> <script>
+
+var csv1 = " Model,MSE,R.Squared\nPre-Trained PRS,1.492,0.402\nAB-PRS,1.069,0.571 "
+var filename1 = "PerformanceScores.csv"
+
+var csv2 = " Percentile,Mean,SD,Model\n0.1,5.013609,1.3386983,Pre-Trained PRS\n0.2,5.571482,1.1793414,Pre-Trained PRS\n0.3,6.027605,1.2592431,Pre-Trained PRS\n0.4,6.358813,1.1965367,Pre-Trained PRS\n0.5,6.666201,1.2134557,Pre-Trained PRS\n0.6,6.694848,1.2300662,Pre-Trained PRS\n0.7,7.122513,1.2299034,Pre-Trained PRS\n0.8,7.442825,1.2555858,Pre-Trained PRS\n0.9,7.756101,1.2232959,Pre-Trained PRS\n1.0,8.418840,1.3145865,Pre-Trained PRS\n0.1,4.623583,1.1300107,AB-PRS\n0.2,5.402667,1.0872285,AB-PRS\n0.3,5.947984,1.0185033,AB-PRS\n0.4,6.210495,1.0370079,AB-PRS\n0.5,6.539522,1.0711807,AB-PRS\n0.6,6.897684,0.9878972,AB-PRS\n0.7,7.194826,1.0388992,AB-PRS\n0.8,7.557690,0.9606502,AB-PRS\n0.9,7.917160,1.1331776,AB-PRS\n1.0,8.783761,1.1477917,AB-PRS "
+var filename2 = "MeanData.csv"
+
+function download_csv_file(csv, filename) {
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+    
+    //provide the name for the CSV file to be downloaded
+    hiddenElement.download = filename;
+    hiddenElement.click();
+}
+</script>
+
+</head>
+
+<body>
+
+<h1><center>Evaluation Results</center></h1>
+
+<h2>Performance Score Table</h2> 
+<table style="border-collapse:collapse;" class=table_1243 border=1>
+<col width="150">
+<col width="150">
+<col width="150">
+<thead>
+<tr>
+  <th id="tableHTML_header_1">Model</th>
+  <th id="tableHTML_header_2">MSE</th>
+  <th id="tableHTML_header_3">R.Squared</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td id="tableHTML_column_1">Pre-Trained PRS</td>
+  <td id="tableHTML_column_2">1.492</td>
+  <td id="tableHTML_column_3">0.402</td>
+</tr>
+<tr>
+  <td id="tableHTML_column_1">AB-PRS</td>
+  <td id="tableHTML_column_2">1.069</td>
+  <td id="tableHTML_column_3">0.571</td>
+</tr>
+</tbody>
+</table> <button onclick="download_csv_file(csv1, filename1)">Download PerformanceScores.csv</button> <h2>Performance Score Comparisons</h2> <iframe src=' Evaluation_Continuous_BarPlot.html ' width='800' height='500'></iframe> <div>This barplot compares the mean squared error (MSE) performance scores between different 
+sets of PRSs derived from different models. </div> <pre><code> 
+   plot <- ggplot(data=Scores, aes(x=reorder(Model, +Score), y=Score, fill=Model)) +
+    geom_bar(stat="identity", width=0.5) +
+    geom_text(aes(label=round(Score, 2)), size=3.5, vjust=-0.3) +
+    scale_y_continuous(expand = expansion(mult = c(0, .1))) + 
+    labs(x="Model", y=ylab, fill="Model") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) </code></pre> <h2>Phenotype vs PRS Percentile</h2>
+ <iframe src=' Evaluation_Continuous_MeanPlot.html ' width='800' height='500'></iframe> <div>This figure plots the mean of the continuous phenotype and +/- 
+1 standard deviation in each polygenic risk score quantiles, for different 
+PRS models. For each model, 10 quantiles are plotted in the graph. 
+A model that performs better should have a higher mean in the
+higher risk score percentiles and a lower mean in the lower percentiles.  
+</div> <button onclick="download_csv_file(csv2, filename2)">Download MeanData.csv</button> <pre><code> 
+  plot <- ggplot(MeanData, aes(x = Percentile, y = Prevalence, color=Model)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin=Mean-SD, ymax=Mean+SD), width=0, alpha=0.8) +
+    labs(x = "Risk Score Percentile", y = "Mean of Phenotype",
+         title = "Mean of Phenotype vs. Risk Score Percentile") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          panel.background = element_blank(), axis.line = element_line(colour = "black")) </code></pre> </body>
+</html>

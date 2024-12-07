@@ -14,7 +14,7 @@ with additive, dominant, recessive, and codominant encoding respectively}
 
 \item{n}{total number of samples}
 
-\item{maf}{minor allele frequency of effective SNPs}
+\item{maf}{minor allele frequency of all SNPs}
 
 \item{effect_size}{effect size of the effective snps, which acts differently
 depending on binary or continuous outcomes. See \eqn{\beta} in the equations sections.}

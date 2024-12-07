@@ -20,9 +20,11 @@
 #' If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses 
 #' the standard \link[glmnet]{glmnet} (default: FALSE)
 #' @param lam.max maximum value of the regularization parameter (lambda) to be 
-#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
+#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default), 
+#' glmnet automatically generates the lambda sequence.
 #' @param lam.min minimum value of the regularization parameter (lambda) to be 
-#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
+#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default), 
+#' glmnet automatically generates the lambda sequence.
 #' @param nlambda number of different lambda values to be evaluated between 
 #' lam.max and lam.min. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
 #' @param alpha desired FDR control level.
@@ -44,7 +46,7 @@
 ABPRS <- function(pre_trained_prs, validation_prs, 
                    training_phenotype, validation_phenotype, 
                    training_genotype, validation_genotype,
-                   family, covariate=NULL, biglasso=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
+                   family, covariate=NULL, biglasso=FALSE, lam.max=NULL, lam.min=NULL,nlambda=100,
                    alpha=0.1, tolerance=0.025, threshold=0.01,err=1e-5, delta=NULL){
   
   if(family != "binomial" && family != "continuous"){
@@ -92,7 +94,9 @@ ABPRS <- function(pre_trained_prs, validation_prs,
 #' whose rows represent individuals and columns represent SNPs. 
 #' @param weights a dataframe containing the weights of the pre-trained prs and 
 #' important \eqn{\theta_{SNPs}}, and the theta1 and theta2 values for those SNPs. 
-#' This dataframe can be generated from \link[ABPRS]{ABPRS}. 
+#' This dataframe can be generated from \link[ABPRS]{ABPRS}. Note that this function 
+#' assumes that the first row contains the pre-trained PRS while the other rows contain 
+#' information about the \eqn{\theta_{SNPs}}.
 #' @return A dataframe with the adaptively-boosted polygenic risk scores. 
 #' @export
 apply_weights<- function(pre_trained_prs, genotype, weights){

@@ -13,8 +13,8 @@ adaptive_variable_selection(
   validation_theta_encoding,
   family,
   biglasso = FALSE,
-  lam.max = 0.002,
-  lam.min = 6e-05,
+  lam.max = NULL,
+  lam.min = NULL,
   nlambda = 50,
   alpha = 0.1,
   tolerance = 0.025,
@@ -44,10 +44,12 @@ If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses
 the standard \link[glmnet]{glmnet} (default: FALSE)}
 
 \item{lam.max}{maximum value of the regularization parameter (lambda) to be
-considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}.}
+considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default),
+glmnet automatically generates the lambda sequence.}
 
 \item{lam.min}{minimum value of the regularization parameter (lambda) to be
-considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}.}
+considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default),
+glmnet automatically generates the lambda sequence.}
 
 \item{nlambda}{number of different lambda values to be evaluated between
 lam.max and lam.min. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}.}

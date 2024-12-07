@@ -14,7 +14,9 @@ whose rows represent individuals and columns represent SNPs.}
 
 \item{weights}{a dataframe containing the weights of the pre-trained prs and
 important \eqn{\theta_{SNPs}}, and the theta1 and theta2 values for those SNPs.
-This dataframe can be generated from \link[ABPRS]{ABPRS}.}
+This dataframe can be generated from \link[ABPRS]{ABPRS}. Note that this function
+assumes that the first row contains the pre-trained PRS while the other rows contain
+information about the \eqn{\theta_{SNPs}}.}
 }
 \value{
 A dataframe with the adaptively-boosted polygenic risk scores.

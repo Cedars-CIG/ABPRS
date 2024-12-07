@@ -84,9 +84,11 @@ REF_DS_inf <- function(x, y, family, lasso_est, delta) {
 #' If true, then the program uses \link[biglasso]{biglasso}. Or else, it uses 
 #' the standard \link[glmnet]{glmnet} (default: FALSE)
 #' @param lam.max maximum value of the regularization parameter (lambda) to be 
-#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
+#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default), 
+#' glmnet automatically generates the lambda sequence.
 #' @param lam.min minimum value of the regularization parameter (lambda) to be 
-#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
+#' considered. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. When NULL (default), 
+#' glmnet automatically generates the lambda sequence.
 #' @param nlambda number of different lambda values to be evaluated between 
 #' lam.max and lam.min. This value is used to generate the lambda sequence in \link[glmnet]{glmnet}. 
 #' @param alpha desired FDR control level.
@@ -103,7 +105,7 @@ REF_DS_inf <- function(x, y, family, lasso_est, delta) {
 adaptive_variable_selection<-function(pre_trained_prs, validation_prs, 
                                       training_phenotype, validation_phenotype, 
                                       training_theta_encoding, validation_theta_encoding,
-                                      family, biglasso=FALSE, lam.max=2e-3, lam.min=6e-5,nlambda=50,
+                                      family, biglasso=FALSE, lam.max=NULL, lam.min=NULL,nlambda=50,
                                       alpha=0.1, tolerance=0.025, threshold=0.01,err=1e-5, delta=NULL){
   
   if(family=="gaussian"){
@@ -140,22 +142,32 @@ adaptive_variable_selection<-function(pre_trained_prs, validation_prs,
     prediction <- (predict(mod1, newdata=df_val_1, type="response")- validation_phenotype)^2
     mod1_val_auc <- mean(prediction)
   }
-
+  
   x<-as.matrix(cbind(pre_trained_prs,training_theta_encoding))
   y<-training_phenotype
   n<-length(y)
-  #Generate a sequence of lambda values that are exponentially spaced between 
-  #lam.max and lam.min with nlambda evenly spaced points in between.
-  lam.seq <- exp(seq(log(lam.max),log(lam.min), length =nlambda))
   
+  #Generate or let glmnet run automatic lambda sequence(NULL)
+  if (is.null(lam.min) || is.null(lam.max)) {
+    lam.seq <- NULL
+  }else{
+    #Generate a sequence of lambda values that are exponentially spaced between 
+    #lam.max and lam.min with nlambda evenly spaced points in between.
+    lam.seq <- exp(seq(log(lam.max),log(lam.min), length =nlambda))
+  }
+
   if(biglasso){ 
     x<-as.big.matrix(x)
-    fit1 <- biglasso(x, y, family = family,lambda=lam.seq)
+    fit1 <- biglasso(x, y, family = family,lambda=lam.seq, nlambda=nlambda)
     beta<-fit1$beta[-1,]
   }else{
-    fit1 <- glmnet(x, y, family = family,lambda=lam.seq)
+    fit1 <- glmnet(x, y, family = family,lambda=lam.seq, nlambda=nlambda)
     beta<-fit1$beta
   }
+  
+  #Record length of lambda sequence
+  lambda1 <- fit1$lambda
+  nlambda <- length(lambda1)
   
   training_validation_t<-matrix(0, nlambda, 4)
   support.list<-list()
@@ -252,7 +264,7 @@ adaptive_variable_selection<-function(pre_trained_prs, validation_prs,
     a<-which.min(training_validation_t[index,4])
   }
   
- # support.F<-support.list[[index[a]]]
+  # support.F<-support.list[[index[a]]]
   support.F <- colnames(training_theta_encoding)[support.list[[index[a]]]]
   
   return(support.F)
