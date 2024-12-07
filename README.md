@@ -31,7 +31,7 @@ For Later:
      library(ABPRS)
      ```
      
-# Tutorial
+## Tutorial
 Please refer to https://cedars-cig.github.io/ABPRS/ for a getting-started tutorial. 
 
 ## Current Functions:
