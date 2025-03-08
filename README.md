@@ -4,7 +4,7 @@ Polygenic risk scores (PRSs) are widely used for predicting genetic risk across
 complex diseases and traits, with thousands of pre-trained models constructed
 using diverse methodologies and data sources. Despite their widespread utility,
 few approaches leverage these pre-trained PRS to further improve their predictive
-performance. We present Adaptively Boosting of Pre-trained PRS (AB-PRS), a
+performance. We present **Adaptively Boosting of Pre-trained PRS (AB-PRS)**, a
 fine-tuning framework that refines pre-trained PRS as baseline model through
 adaptive variable selection and model boosting to uncover signals missed by the
 original models. Simulations show AB-PRS effectively identifies signals orthogo-
@@ -50,6 +50,3 @@ weights <- ABPRS(pre_trained_prs = training_prs, validation_prs=validation_prs,
                  err=1e-5, delta=NULL)
 ```
 
-## References
-
-To Be Added
