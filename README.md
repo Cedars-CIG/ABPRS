@@ -7,10 +7,10 @@ few approaches leverage these pre-trained PRS to further improve their predictiv
 performance. We present **Adaptively Boosting of Pre-trained PRS (AB-PRS)**, a
 fine-tuning framework that refines pre-trained PRS as baseline model through
 adaptive variable selection and model boosting to uncover signals missed by the
-original models. Simulations show AB-PRS effectively identifies signals orthogo-
-nal to pre-trained PRS while controlling false discovery rates. Using UK Biobank
-data, we fine-tuned pre-trained PRS for binary diseases and continuous traits, val-
-idating results across three independent datasets: All of Us, eMERGE, and Penn
+original models. Simulations show AB-PRS effectively identifies signals orthogonal
+to pre-trained PRS while controlling false discovery rates. Using UK Biobank
+data, we fine-tuned pre-trained PRS for binary diseases and continuous traits, validating 
+results across three independent datasets: All of Us, eMERGE, and Penn
 Medicine Biobank. Real data analyses confirmed improved model prediction, risk
 stratification, and robustness. AB-PRS provides a scalable solution to enhance
 existing and future PRS, advancing predictive capabilities in diverse datasets.
