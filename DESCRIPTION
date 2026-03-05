@@ -1,6 +1,8 @@
 Package: ABPRS
 Title: Adaptively Boosting Pre-trained Polygenic Risk Scores
 Version: 1.0.0
+Depends:
+    R (>= 4.1)
 Authors@R: c(
     person("Jie", "Hu", email="Jie.Hu@pennmedicine.upenn.edu", role = "aut"),
     person("Raelynn", "Chen", email="Raelynn.Chen@cshs.org", role = "aut"),
