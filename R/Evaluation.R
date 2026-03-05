@@ -1,14 +1,14 @@
-library(dplyr)
-library(ROCR)
-library(glmnet)
-library(biglasso)
-library(readr)
-library(data.table)
-library(ggplot2)
-library(ggh4x)
-library(plotly)
-library(tableHTML)
-library(htmlwidgets)
+#' library(dplyr)
+#' library(ROCR)
+#' library(glmnet)
+#' library(biglasso)
+#' library(readr)
+#' library(data.table)
+#' library(ggplot2)
+#' library(ggh4x)
+#' library(plotly)
+#' library(tableHTML)
+#' library(htmlwidgets)
 
 #' Evaluation Function 
 #' 
@@ -122,7 +122,7 @@ html_binary<- function(phenotype, all_prs, all_names, style, bin, filename){
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
             panel.background = element_blank(), axis.line.x = element_line(colour = \"black\")) + 
     facet_grid(cols=vars(Method),scales=\"free_x\")"
-  saveWidget(DensityPlot, paste0(filename, "_DensityPlot.html"), selfcontained = TRUE)
+  htmlwidgets::saveWidget(DensityPlot, paste0(filename, "_DensityPlot.html"), selfcontained = TRUE)
   prs_csv <- convert_df_to_string(PRSTable)
   
   # PLOT 3: Percentage of Cases vs. PRS Percentile
@@ -136,7 +136,7 @@ html_binary<- function(phenotype, all_prs, all_names, style, bin, filename){
          title = \"Prevalence vs. Risk Score Percentile\") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
-  saveWidget(PrevalencePlot, paste0(filename, "_PrevalencePlot.html"), selfcontained = TRUE)
+  htmlwidgets::saveWidget(PrevalencePlot, paste0(filename, "_PrevalencePlot.html"), selfcontained = TRUE)
   
   # PLOT 4: Odds Ratio Plot
   #TBA
@@ -233,7 +233,7 @@ html_continuous <- function(phenotype, all_prs, all_names, style, bin, filename)
     labs(x=\"Model\", y=ylab, fill=\"Model\") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
-  saveWidget(BarPlot, paste0(filename, "_BarPlot.html"), selfcontained = TRUE)
+  htmlwidgets::saveWidget(BarPlot, paste0(filename, "_BarPlot.html"), selfcontained = TRUE)
   PerformanceScores[,-1]<- round(PerformanceScores[,-1], 3)
   scores_csv <- convert_df_to_string(PerformanceScores)
   
@@ -249,7 +249,7 @@ html_continuous <- function(phenotype, all_prs, all_names, style, bin, filename)
          title = \"Mean of Phenotype vs. Risk Score Percentile\") +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           panel.background = element_blank(), axis.line = element_line(colour = \"black\"))"
-  saveWidget(MeanPlot, paste0(filename, "_MeanPlot.html"), selfcontained = TRUE)
+  htmlwidgets::saveWidget(MeanPlot, paste0(filename, "_MeanPlot.html"), selfcontained = TRUE)
 
   # Plot 3: Mean Difference Plot
   MeanDiff <- data.frame(TBA=c("TBA", "TBA"))
@@ -391,10 +391,10 @@ Prevalence_Data <- function(pheno, all_prs, all_names, n){
     data <- data.frame(Percentile = percentile, Phenotype = pheno)
     
     # Calculate Prevalence
-    prevalence <- data %>%
-      dplyr::mutate(Percentile = dplyr::ntile(Percentile, n)/n) %>%
-      dplyr::group_by(Percentile) %>%
-      dplyr::summarize(Prevalence = mean(Phenotype)) %>%
+    prevalence <- data |>
+      dplyr::mutate(Percentile = dplyr::ntile(Percentile, n)/n) |>
+      dplyr::group_by(Percentile) |>
+      dplyr::summarize(Prevalence = mean(Phenotype)) |>
       dplyr::mutate(Model = name)
     
     # Combine the current prevalence data with the accumulated data
@@ -432,10 +432,10 @@ Mean_Data <- function(pheno, all_prs, all_names, n){
     data <- data.frame(Percentile = percentile, Phenotype = pheno)
     
     # Calculate Mean
-    mean <- data %>%
-      dplyr::mutate(Percentile = dplyr::ntile(Percentile, n)/n) %>%
-      dplyr::group_by(Percentile) %>%
-      dplyr::summarize(Mean = mean(Phenotype), SD=sd(Phenotype)) %>%
+    mean <- data |>
+      dplyr::mutate(Percentile = dplyr::ntile(Percentile, n)/n) |>
+      dplyr::group_by(Percentile) |>
+      dplyr::summarize(Mean = mean(Phenotype), SD=sd(Phenotype)) |>
       dplyr::mutate(Model = name) 
     
     # Combine the current mean data with the accumulated data
